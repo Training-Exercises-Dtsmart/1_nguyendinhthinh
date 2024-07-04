@@ -14,7 +14,7 @@ class UserController extends Controller{
 
     public function actionIndex(){
         $user = new User();
-        return $user->find()->all();
+        return $user->find()->active()->all();
     }
 
     public function actionCreate()
@@ -26,6 +26,7 @@ class UserController extends Controller{
         }
         $hash = Yii::$app->getSecurity()->generatePasswordHash(Yii::$app->request->post('password'));
         $userForm->password = $hash;
+        $userForm->status = User::STATUS_INACTIVE;
         $userForm->save();
         // return $userForm;
         return [
@@ -40,7 +41,6 @@ class UserController extends Controller{
 
     public function actionUpdate($id){
         $user = User::find()->where(['id' => $id])->one();
-
         if(!$user){
             return [
                 'status' => false,
@@ -50,6 +50,7 @@ class UserController extends Controller{
                 'message' => 'User dont exists'
             ];
         }
+
         $user->load(Yii::$app->request->post());
         if(!$user->validate()){
             return $user->getErrors();
@@ -79,8 +80,11 @@ class UserController extends Controller{
             ];
         }
 
-        $user->delete();
-        // return $user;
+        if(!$user->delete()){
+            return $user->getErrors();
+        };
+
+
         return [
             'status' => true,
             'data' => [

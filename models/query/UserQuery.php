@@ -13,5 +13,7 @@ use \app\models\User;
  */
 class UserQuery extends \yii\db\ActiveQuery
 {
-
+    public function active(){
+        return $this->andWhere(["status" => User::STATUS_ACTIVE]);
+    }
 }

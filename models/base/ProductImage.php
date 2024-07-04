@@ -6,6 +6,7 @@ namespace app\models\base;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\TimestampBehavior;
 use \app\models\query\ProductImageQuery;
 
 /**
@@ -15,6 +16,8 @@ use \app\models\query\ProductImageQuery;
  * @property integer $product_id
  * @property string $base_url
  * @property string $path_url
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property \app\models\Product $product
  */
@@ -27,6 +30,20 @@ abstract class ProductImage extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'product_image';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['timestamp'] = [
+            'class' => TimestampBehavior::class,
+            'value' => (new \DateTime())->format('Y-m-d H:i:s'),
+                        ];
+        
+    return $behaviors;
     }
 
     /**
@@ -52,6 +69,8 @@ abstract class ProductImage extends \yii\db\ActiveRecord
             'product_id' => 'Product ID',
             'base_url' => 'Base Url',
             'path_url' => 'Path Url',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ]);
     }
 

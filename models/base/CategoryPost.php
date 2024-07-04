@@ -6,6 +6,7 @@ namespace app\models\base;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\TimestampBehavior;
 use \app\models\query\CategoryPostQuery;
 
 /**
@@ -13,6 +14,8 @@ use \app\models\query\CategoryPostQuery;
  *
  * @property integer $category_id
  * @property string $category_name
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property \app\models\Post[] $posts
  */
@@ -25,6 +28,20 @@ abstract class CategoryPost extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'category_post';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['timestamp'] = [
+            'class' => TimestampBehavior::class,
+            'value' => (new \DateTime())->format('Y-m-d H:i:s'),
+                        ];
+        
+    return $behaviors;
     }
 
     /**
@@ -47,6 +64,8 @@ abstract class CategoryPost extends \yii\db\ActiveRecord
         return ArrayHelper::merge(parent::attributeLabels(), [
             'category_id' => 'Category ID',
             'category_name' => 'Category Name',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ]);
     }
 

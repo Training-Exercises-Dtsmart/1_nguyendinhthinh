@@ -9,5 +9,8 @@ use \app\models\base\CategoryProduct as BaseCategoryProduct;
  */
 class CategoryProduct extends BaseCategoryProduct
 {
-
+    public function formName()
+    {
+        return "";
+    }
 }

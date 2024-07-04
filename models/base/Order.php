@@ -6,6 +6,7 @@ namespace app\models\base;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\TimestampBehavior;
 use \app\models\query\OrderQuery;
 
 /**
@@ -15,6 +16,8 @@ use \app\models\query\OrderQuery;
  * @property integer $user_id
  * @property double $total
  * @property integer $status
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property \app\models\OrderDetail[] $orderDetails
  * @property \app\models\User $user
@@ -28,6 +31,20 @@ abstract class Order extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'order';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['timestamp'] = [
+            'class' => TimestampBehavior::class,
+            'value' => (new \DateTime())->format('Y-m-d H:i:s'),
+                        ];
+        
+    return $behaviors;
     }
 
     /**
@@ -53,6 +70,8 @@ abstract class Order extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'total' => 'Total',
             'status' => 'Status',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ]);
     }
 

@@ -6,6 +6,7 @@ namespace app\models\base;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\TimestampBehavior;
 use \app\models\query\PostQuery;
 
 /**
@@ -18,6 +19,8 @@ use \app\models\query\PostQuery;
  * @property integer $user_id
  * @property integer $category_id
  * @property integer $status
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property \app\models\CategoryPost $category
  * @property \app\models\User $user
@@ -31,6 +34,20 @@ abstract class Post extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'post';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['timestamp'] = [
+            'class' => TimestampBehavior::class,
+            'value' => (new \DateTime())->format('Y-m-d H:i:s'),
+                        ];
+        
+    return $behaviors;
     }
 
     /**
@@ -64,6 +81,8 @@ abstract class Post extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'category_id' => 'Category ID',
             'status' => 'Status',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ]);
     }
 

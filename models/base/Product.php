@@ -6,6 +6,7 @@ namespace app\models\base;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\TimestampBehavior;
 use \app\models\query\ProductQuery;
 
 /**
@@ -19,6 +20,8 @@ use \app\models\query\ProductQuery;
  * @property integer $stock
  * @property integer $status
  * @property integer $category_id
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property \app\models\CategoryProduct $category
  * @property \app\models\OrderDetail[] $orderDetails
@@ -33,6 +36,20 @@ abstract class Product extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'product';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['timestamp'] = [
+            'class' => TimestampBehavior::class,
+            'value' => (new \DateTime())->format('Y-m-d H:i:s'),
+                        ];
+        
+    return $behaviors;
     }
 
     /**
@@ -66,6 +83,8 @@ abstract class Product extends \yii\db\ActiveRecord
             'stock' => 'Stock',
             'status' => 'Status',
             'category_id' => 'Category ID',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ]);
     }
 

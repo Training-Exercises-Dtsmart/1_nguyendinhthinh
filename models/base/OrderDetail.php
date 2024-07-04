@@ -6,6 +6,7 @@ namespace app\models\base;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\TimestampBehavior;
 use \app\models\query\OrderDetailQuery;
 
 /**
@@ -15,6 +16,8 @@ use \app\models\query\OrderDetailQuery;
  * @property integer $order_id
  * @property integer $product_id
  * @property integer $quantity
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property \app\models\Order $order
  * @property \app\models\Product $product
@@ -28,6 +31,20 @@ abstract class OrderDetail extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'order_detail';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['timestamp'] = [
+            'class' => TimestampBehavior::class,
+            'value' => (new \DateTime())->format('Y-m-d H:i:s'),
+                        ];
+        
+    return $behaviors;
     }
 
     /**
@@ -53,6 +70,8 @@ abstract class OrderDetail extends \yii\db\ActiveRecord
             'order_id' => 'Order ID',
             'product_id' => 'Product ID',
             'quantity' => 'Quantity',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ]);
     }
 

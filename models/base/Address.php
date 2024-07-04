@@ -6,6 +6,7 @@ namespace app\models\base;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\TimestampBehavior;
 use \app\models\query\AddressQuery;
 
 /**
@@ -16,6 +17,8 @@ use \app\models\query\AddressQuery;
  * @property string $city
  * @property string $country
  * @property integer $user_id
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property \app\models\User $user
  */
@@ -28,6 +31,20 @@ abstract class Address extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'address';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['timestamp'] = [
+            'class' => TimestampBehavior::class,
+            'value' => (new \DateTime())->format('Y-m-d H:i:s'),
+                        ];
+        
+    return $behaviors;
     }
 
     /**
@@ -54,6 +71,8 @@ abstract class Address extends \yii\db\ActiveRecord
             'city' => 'City',
             'country' => 'Country',
             'user_id' => 'User ID',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ]);
     }
 

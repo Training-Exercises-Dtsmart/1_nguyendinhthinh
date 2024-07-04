@@ -50,7 +50,7 @@ $config = [
             'showScriptName' => false,
             'enableStrictParsing' => false,
             'rules' => [
-                '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
+                // '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
 
 
                 // 'POST <controller:(user|product)>/create' => '<controller>/create',
