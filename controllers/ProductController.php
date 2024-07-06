@@ -60,7 +60,7 @@ class ProductController extends Controller{
         if(!$product->validate()){
             return $product->getErrors();
         }
-        $product->update();
+        $product->save();
 
         return [
             'status' => true,
@@ -75,18 +75,19 @@ class ProductController extends Controller{
 
     public function actionDelete($id){
         $product = Product::find()->where(["id"=>$id])->one();
-
         if(!$product){
-
+            return $this->json(false, [], "Product not found");
         }
-
-        return $product->delete();
+        if(!$product->delete()){
+            return $this->json(false, [], "Can't delete product");
+        }
+        return $this->json(true, [], 'Delete product successfully');
     }
 
     public function actionSearch(){
         $searchModel = new ProductSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $dataProvider;
+        return $this->json(true, ["products" => $dataProvider->getModels()], "Find successfully", 500); 
     }
 }

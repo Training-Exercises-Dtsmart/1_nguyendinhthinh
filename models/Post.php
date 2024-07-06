@@ -9,5 +9,8 @@ use \app\models\base\Post as BasePost;
  */
 class Post extends BasePost
 {
-
+    public function formName()
+    {
+        return "";
+    }
 }

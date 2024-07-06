@@ -9,5 +9,8 @@ use \app\models\base\Address as BaseAddress;
  */
 class Address extends BaseAddress
 {
-
+    public function formName()
+    {
+        return "";
+    }
 }

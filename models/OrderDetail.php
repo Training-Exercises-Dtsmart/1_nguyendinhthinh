@@ -9,5 +9,8 @@ use \app\models\base\OrderDetail as BaseOrderDetail;
  */
 class OrderDetail extends BaseOrderDetail
 {
-
+    public function formName()
+    {
+        return "";
+    }
 }

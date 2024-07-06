@@ -9,5 +9,8 @@ use \app\models\base\CategoryPost as BaseCategoryPost;
  */
 class CategoryPost extends BaseCategoryPost
 {
-
+    public function formName()
+    {
+        return "";
+    }
 }

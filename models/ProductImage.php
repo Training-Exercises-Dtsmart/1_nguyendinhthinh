@@ -9,5 +9,8 @@ use \app\models\base\ProductImage as BaseProductImage;
  */
 class ProductImage extends BaseProductImage
 {
-
+    public function formName()
+    {
+        return "";
+    }
 }
