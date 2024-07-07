@@ -1,7 +1,7 @@
 <?php
 
 namespace app\modules\models\search;
-use app\models\Post;
+use app\modules\models\Post;
 use yii\data\ActiveDataProvider;
 
 class PostSearch extends Post{
