@@ -3,112 +3,56 @@
 namespace app\controllers;
 
 use Yii;
-use yii\rest\Controller;
-use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
+use app\controllers\Controller;
 
-class CalculateController extends Controller{
+class CalculateController extends Controller
+{
 
-    public function actionTotal(){
-        if(!Yii::$app->request->isPost){
-            throw new NotFoundHttpException('The requested resource was not found.',404);
-        }
-        $data = Yii::$app->request->post();
-        $a = $data['a'];
-        $b = $data['b'];
+    public function actionTotal()
+    {
+        $a = Yii::$app->request->post('a');
+        $b = Yii::$app->request->post('b');
 
-        if(is_numeric($a) == false or is_numeric($b) == false){
-            return [
-                "status" => false,
-                "data" => [
-                    "now" => date('d/m/Y'),
-                ],
-                "message" => 'a or b is not a number'
-            ];
+        if (!is_numeric($a) or !is_numeric($b)) {
+            //bad request, number invalid => status code = 400
+            return $this->json(false, ["now" => date('d/m/y')], 'a or b is not a number', 400 );
         }
 
         $result = $a + $b;
-        return [
-            "status" => true,
-            "data" => [
-                "now" => date('d/m/Y'),
-                "result" => $result,
-            ],
-            "message" => 'Success'
-        ];
+        return $this->json(true, ["now" => date('d/m/y'), 'result' => $result], 'Success');
     }
 
-    public function actionDivide(){
-        if(!Yii::$app->request->isPost){
-            throw new NotFoundHttpException("The request resource was not found", 404);
-        }
+    public function actionDivide()
+    {
+        $a = Yii::$app->request->post('a');
+        $b = Yii::$app->request->post('b');
 
-        $data = Yii::$app->request->post();
-        $a = $data['a'];
-        $b = $data['b'];
-
-        if(is_numeric($a) == false or is_numeric($b) == false){
-            return [
-                "status" => false,
-                "data" => [
-                    "now" => date('d/m/Y')
-                ],
-                "message" => "a or b is not a number"
-            ];
+        //bad request, number invalid => status code = 400
+        if (!is_numeric($a) or !is_numeric($b)) {
+            return $this->json(false, ["now" => date('d/m/Y')], 'a or b is not a number', 400);
         }
-        if($b == 0){
-            return [
-                "status" => false,
-                "data" => [
-                    "now" => date('d/m/Y')
-                ],
-                "message" => "Number b have to different zero"
-            ];
+        if ($b == 0) {
+            return $this->json(false, ["now" => date('d/m/Y')], "Number b can't be zero", 400);
         }
 
         $result = $a / $b;
-        return [
-            "status" => true,
-            "data" => [
-                "now" => date('d/m/Y'),
-                "result" => $result,
-            ],
-            "message" => 'Success'
-        ];
+        return $this->json(true, ["now" => date('d/m/y'), 'result' => $result], 'Success');
     }
 
-    public function actionAverage(){
-        if(!Yii::$app->request->isPost){
-            throw new NotFoundHttpException("The request resource was not found", 404);
-        }
+    public function actionAverage()
+    {
+        $numbers = Yii::$app->request->post('numbers');
+        $arrayNumber = explode(',', $numbers);
 
-        $request = Yii::$app->request;
-        $quantity = count($request->post());
-        $arrayNumber = [];
-
-        #input name="number_i"
-        for($i = 1; $i <= $quantity; $i++){
-            $number = $request->post('number_'. $i);
-            if(is_numeric($number) == false){
-                return [
-                    "status" => false,
-                    "data" => [
-                        "now" => date('d/m/Y')
-                    ],
-                    "message" => "Position ".$i." is not a number"
-                ];
+        //bad request, number invalid => status code = 400
+        foreach ($arrayNumber as $number) {
+            if (!is_numeric($number)) {
+                return $this->json(false, ["now" => date('d/m/Y')], 'Number is not a number', 400);
             }
-            array_push($arrayNumber, $number);
         }
 
-        $sum = array_sum($arrayNumber);
-        $result = round($sum/$quantity,1);
-        return [
-            "status" => true,
-            "data" => [
-                "now" => date('d/m/Y'),
-                "result" => $result
-            ],
-            "message" => "Success"
-        ];
+        $result = round(array_sum($arrayNumber) / count($arrayNumber), 2);
+        return $this->json(true, ["now" => date('d/m/y'), 'result' => $result], 'Success');
     }
 }
