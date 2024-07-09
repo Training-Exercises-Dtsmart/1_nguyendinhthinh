@@ -17,12 +17,12 @@ use \app\models\query\PostQuery;
  * @property string $body
  * @property string $publish_date
  * @property integer $user_id
- * @property integer $category_id
+ * @property integer $category_post_id
  * @property integer $status
  * @property string $created_at
  * @property string $updated_at
  *
- * @property \app\models\CategoryPost $category
+ * @property \app\models\CategoryPost $categoryPost
  * @property \app\models\User $user
  */
 abstract class Post extends \yii\db\ActiveRecord
@@ -60,10 +60,10 @@ abstract class Post extends \yii\db\ActiveRecord
             [['title'], 'required'],
             [['body'], 'string'],
             [['publish_date'], 'safe'],
-            [['user_id', 'category_id', 'status'], 'integer'],
+            [['user_id', 'category_post_id', 'status'], 'integer'],
             [['title'], 'string', 'max' => 255],
             [['title'], 'unique'],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\CategoryPost::class, 'targetAttribute' => ['category_id' => 'category_id']],
+            [['category_post_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\CategoryPost::class, 'targetAttribute' => ['category_post_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\User::class, 'targetAttribute' => ['user_id' => 'id']]
         ]);
     }
@@ -79,7 +79,7 @@ abstract class Post extends \yii\db\ActiveRecord
             'body' => 'Body',
             'publish_date' => 'Publish Date',
             'user_id' => 'User ID',
-            'category_id' => 'Category ID',
+            'category_post_id' => 'Category Post ID',
             'status' => 'Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
@@ -89,9 +89,9 @@ abstract class Post extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCategory()
+    public function getCategoryPost()
     {
-        return $this->hasOne(\app\models\CategoryPost::class, ['category_id' => 'category_id']);
+        return $this->hasOne(\app\models\CategoryPost::class, ['id' => 'category_post_id']);
     }
 
     /**

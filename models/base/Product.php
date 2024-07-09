@@ -13,18 +13,19 @@ use \app\models\query\ProductQuery;
  * This is the base-model class for table "product".
  *
  * @property integer $id
- * @property string $product_name
+ * @property string $name
  * @property double $price
- * @property string $description
- * @property string $image
  * @property integer $stock
+ * @property string $description
+ * @property string $thumbnail
  * @property integer $status
- * @property integer $category_id
+ * @property integer $category_product_id
+ * @property string $deleted_at
  * @property string $created_at
  * @property string $updated_at
  *
- * @property \app\models\CategoryProduct $category
- * @property \app\models\OrderDetail[] $orderDetails
+ * @property \app\models\CategoryProduct $categoryProduct
+ * @property \app\models\OrderItem[] $orderItems
  * @property \app\models\ProductImage[] $productImages
  */
 abstract class Product extends \yii\db\ActiveRecord
@@ -59,13 +60,14 @@ abstract class Product extends \yii\db\ActiveRecord
     {
         $parentRules = parent::rules();
         return ArrayHelper::merge($parentRules, [
-            [['product_name', 'price'], 'required'],
+            [['name', 'price'], 'required'],
             [['price'], 'number'],
-            [['description', 'image'], 'string'],
-            [['stock', 'status', 'category_id'], 'integer'],
-            [['product_name'], 'string', 'max' => 255],
-            [['product_name'], 'unique'],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\CategoryProduct::class, 'targetAttribute' => ['category_id' => 'category_id']]
+            [['stock', 'status', 'category_product_id'], 'integer'],
+            [['description', 'thumbnail'], 'string'],
+            [['deleted_at'], 'safe'],
+            [['name'], 'string', 'max' => 255],
+            [['name'], 'unique'],
+            [['category_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\CategoryProduct::class, 'targetAttribute' => ['category_product_id' => 'id']]
         ]);
     }
 
@@ -76,32 +78,33 @@ abstract class Product extends \yii\db\ActiveRecord
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id' => 'ID',
-            'product_name' => 'Product Name',
+            'name' => 'Name',
             'price' => 'Price',
-            'description' => 'Description',
-            'image' => 'Image',
             'stock' => 'Stock',
+            'description' => 'Description',
+            'thumbnail' => 'Thumbnail',
             'status' => 'Status',
-            'category_id' => 'Category ID',
+            'category_product_id' => 'Category Product ID',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'deleted_at' => 'Deleted At',
         ]);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCategory()
+    public function getCategoryProduct()
     {
-        return $this->hasOne(\app\models\CategoryProduct::class, ['category_id' => 'category_id']);
+        return $this->hasOne(\app\models\CategoryProduct::class, ['id' => 'category_product_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderDetails()
+    public function getOrderItems()
     {
-        return $this->hasMany(\app\models\OrderDetail::class, ['product_id' => 'id']);
+        return $this->hasMany(\app\models\OrderItem::class, ['product_id' => 'id']);
     }
 
     /**

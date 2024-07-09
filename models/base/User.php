@@ -18,12 +18,13 @@ use \app\models\query\UserQuery;
  * @property string $fullname
  * @property string $telephone
  * @property integer $status
+ * @property string $deleted_at
  * @property string $created_at
  * @property string $updated_at
  *
- * @property \app\models\Address[] $addresses
  * @property \app\models\Order[] $orders
  * @property \app\models\Post[] $posts
+ * @property \app\models\UserAddress[] $userAddresses
  */
 abstract class User extends \yii\db\ActiveRecord
 {
@@ -59,6 +60,7 @@ abstract class User extends \yii\db\ActiveRecord
         return ArrayHelper::merge($parentRules, [
             [['username', 'password'], 'required'],
             [['status'], 'integer'],
+            [['deleted_at'], 'safe'],
             [['username', 'password', 'fullname', 'telephone'], 'string', 'max' => 255],
             [['username'], 'unique']
         ]);
@@ -78,15 +80,8 @@ abstract class User extends \yii\db\ActiveRecord
             'status' => 'Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'deleted_at' => 'Deleted At',
         ]);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAddresses()
-    {
-        return $this->hasMany(\app\models\Address::class, ['user_id' => 'id']);
     }
 
     /**
@@ -103,6 +98,14 @@ abstract class User extends \yii\db\ActiveRecord
     public function getPosts()
     {
         return $this->hasMany(\app\models\Post::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserAddresses()
+    {
+        return $this->hasMany(\app\models\UserAddress::class, ['user_id' => 'id']);
     }
 
     /**

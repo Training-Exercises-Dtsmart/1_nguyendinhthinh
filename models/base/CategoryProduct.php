@@ -12,8 +12,10 @@ use \app\models\query\CategoryProductQuery;
 /**
  * This is the base-model class for table "category_product".
  *
- * @property integer $category_id
- * @property string $category_name
+ * @property integer $id
+ * @property string $name
+ * @property integer $status
+ * @property string $deleted_at
  * @property string $created_at
  * @property string $updated_at
  *
@@ -51,9 +53,11 @@ abstract class CategoryProduct extends \yii\db\ActiveRecord
     {
         $parentRules = parent::rules();
         return ArrayHelper::merge($parentRules, [
-            [['category_name'], 'required'],
-            [['category_name'], 'string', 'max' => 255],
-            [['category_name'], 'unique']
+            [['name'], 'required'],
+            [['status'], 'integer'],
+            [['deleted_at'], 'safe'],
+            [['name'], 'string', 'max' => 255],
+            [['name'], 'unique']
         ]);
     }
 
@@ -63,10 +67,12 @@ abstract class CategoryProduct extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'category_id' => 'Category ID',
-            'category_name' => 'Category Name',
+            'id' => 'ID',
+            'name' => 'Name',
+            'status' => 'Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'deleted_at' => 'Deleted At',
         ]);
     }
 
@@ -75,7 +81,7 @@ abstract class CategoryProduct extends \yii\db\ActiveRecord
      */
     public function getProducts()
     {
-        return $this->hasMany(\app\models\Product::class, ['category_id' => 'category_id']);
+        return $this->hasMany(\app\models\Product::class, ['category_product_id' => 'id']);
     }
 
     /**

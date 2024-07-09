@@ -14,8 +14,9 @@ use \app\models\query\ProductImageQuery;
  *
  * @property integer $id
  * @property integer $product_id
- * @property string $base_url
- * @property string $path_url
+ * @property string $name
+ * @property string $image_url
+ * @property string $deleted_at
  * @property string $created_at
  * @property string $updated_at
  *
@@ -54,7 +55,8 @@ abstract class ProductImage extends \yii\db\ActiveRecord
         $parentRules = parent::rules();
         return ArrayHelper::merge($parentRules, [
             [['product_id'], 'integer'],
-            [['base_url', 'path_url'], 'string', 'max' => 255],
+            [['deleted_at'], 'safe'],
+            [['name', 'image_url'], 'string', 'max' => 255],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\Product::class, 'targetAttribute' => ['product_id' => 'id']]
         ]);
     }
@@ -67,10 +69,11 @@ abstract class ProductImage extends \yii\db\ActiveRecord
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id' => 'ID',
             'product_id' => 'Product ID',
-            'base_url' => 'Base Url',
-            'path_url' => 'Path Url',
+            'name' => 'Name',
+            'image_url' => 'Image Url',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'deleted_at' => 'Deleted At',
         ]);
     }
 

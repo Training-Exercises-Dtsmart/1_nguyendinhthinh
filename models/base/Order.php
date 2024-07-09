@@ -15,11 +15,13 @@ use \app\models\query\OrderQuery;
  * @property integer $id
  * @property integer $user_id
  * @property double $total
+ * @property string $order_date
  * @property integer $status
+ * @property string $deleted_at
  * @property string $created_at
  * @property string $updated_at
  *
- * @property \app\models\OrderDetail[] $orderDetails
+ * @property \app\models\OrderItem[] $orderItems
  * @property \app\models\User $user
  */
 abstract class Order extends \yii\db\ActiveRecord
@@ -56,6 +58,7 @@ abstract class Order extends \yii\db\ActiveRecord
         return ArrayHelper::merge($parentRules, [
             [['user_id', 'status'], 'integer'],
             [['total'], 'number'],
+            [['order_date', 'deleted_at'], 'safe'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\User::class, 'targetAttribute' => ['user_id' => 'id']]
         ]);
     }
@@ -69,18 +72,20 @@ abstract class Order extends \yii\db\ActiveRecord
             'id' => 'ID',
             'user_id' => 'User ID',
             'total' => 'Total',
+            'order_date' => 'Order Date',
             'status' => 'Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'deleted_at' => 'Deleted At',
         ]);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderDetails()
+    public function getOrderItems()
     {
-        return $this->hasMany(\app\models\OrderDetail::class, ['order_id' => 'id']);
+        return $this->hasMany(\app\models\OrderItem::class, ['order_id' => 'id']);
     }
 
     /**
