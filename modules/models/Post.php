@@ -1,9 +1,11 @@
 <?php
 
 namespace app\modules\models;
+
 use app\models\Post as BasePost;
 
-class Post extends BasePost{
+class Post extends BasePost
+{
 
     public function fields()
     {
@@ -14,6 +16,6 @@ class Post extends BasePost{
 
     public function getCategoryName()
     {
-        return isset($this->category->category_name) ? $this->category->category_name : '';
+        return isset($this->category) ? $this->category->category_name : null;
     }
 }
