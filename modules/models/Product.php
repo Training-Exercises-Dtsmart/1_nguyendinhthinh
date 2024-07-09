@@ -15,6 +15,6 @@ class Product extends BaseProduct
 
     public function getCategoryName()
     {
-        return isset($this->category) ? $this->category->category_name : null;
+        return isset($this->categoryProduct) ? $this->categoryProduct->name : null;
     }
 }

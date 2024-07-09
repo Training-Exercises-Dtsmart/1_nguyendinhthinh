@@ -16,6 +16,6 @@ class Post extends BasePost
 
     public function getCategoryName()
     {
-        return isset($this->category) ? $this->category->category_name : null;
+        return isset($this->categoryPost) ? $this->categoryPost->name : null;
     }
 }

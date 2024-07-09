@@ -9,7 +9,6 @@ use app\models\form\ProductForm;
 use app\models\Product;
 use app\models\search\ProductSearch;
 use app\controllers\Controller;
-use function PHPUnit\Framework\isNull;
 
 class ProductController extends Controller
 {

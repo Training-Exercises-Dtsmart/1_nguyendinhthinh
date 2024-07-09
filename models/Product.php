@@ -13,4 +13,16 @@ class Product extends BaseProduct
     {
         return "";
     }
+
+    public function fields()
+    {
+        return array_merge(parent::fields(), [
+            "category_name" => "categoryName",
+        ]);
+    }
+
+    public function getCategoryName()
+    {
+        return isset($this->categoryProduct) ? $this->categoryProduct->name : null;
+    }
 }
