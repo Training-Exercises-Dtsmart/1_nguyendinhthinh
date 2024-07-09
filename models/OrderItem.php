@@ -9,5 +9,8 @@ use \app\models\base\OrderItem as BaseOrderItem;
  */
 class OrderItem extends BaseOrderItem
 {
-
+    public function formName()
+    {
+        return "";
+    }
 }
