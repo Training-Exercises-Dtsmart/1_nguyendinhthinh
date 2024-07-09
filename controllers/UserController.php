@@ -3,99 +3,63 @@
 namespace app\controllers;
 
 use Yii;
-use yii\rest\Controller;
 use app\models\form\UserForm;
 use app\models\User;
+use app\controllers\Controller;
 
-
-class UserController extends Controller{
+class UserController extends Controller
+{
     private $username = 'dinhthinh';
     private $password = 'e10adc3949ba59abbe56e057f20f883e'; #123456
 
-    public function actionIndex(){
-        $user = new User();
-        return $user->find()->active()->all();
+    public function actionIndex()
+    {
+        $users = User::find()->active()->all();
+        return $this->json(true, ["now" => date('d/m/Y'), 'users' => $users], 'Success');
     }
 
     public function actionCreate()
     {
         $userForm = new UserForm();
         $userForm->load(Yii::$app->request->post());
-        if (!$userForm->validate()) {
-            return $userForm->getErrors();
-        }
         $hash = Yii::$app->getSecurity()->generatePasswordHash(Yii::$app->request->post('password'));
         $userForm->password = $hash;
-        $userForm->status = User::STATUS_INACTIVE;
-        $userForm->save();
-        // return $userForm;
-        return [
-            'status' => true,
-            'data' => [
-                'now' => date('d/m/Y'),
-                'user' => $userForm
-            ],
-            'message' => 'Create user success'
-        ];
+
+        if (!$userForm->validate() || !$userForm->save()) {
+            return $this->json(false, ['now' => date('d/m/Y'), 'errors' => $userForm->getErrors()], 'Cant create product', 400);
+        }
+        return $this->json(true, ['now' => date('d/m/Y'), 'user' => $userForm], 'Success');
     }
 
-    public function actionUpdate($id){
+    public function actionUpdate($id)
+    {
         $user = User::find()->where(['id' => $id])->one();
-        if(!$user){
-            return [
-                'status' => false,
-                'data' => [
-                    'now' => date('d/m/Y'),
-                ],
-                'message' => 'User dont exists'
-            ];
+        if (empty($user)) {
+            return $this->json(false, ['now' => date('d/m/Y')], 'Product not found', 404);
         }
 
         $user->load(Yii::$app->request->post());
-        if(!$user->validate()){
-            return $user->getErrors();
+        if (!$user->validate() || !$user->save()) {
+            return $this->json(false, ['now' => date('d/m/Y')], 'Cant create product', 400);
         }
-        $user->save();
-        // return $user;
-        return [
-            'status' => true,
-            'data' => [
-                'now' => date('d/m/Y'),
-                'user' => $user,
-            ],
-            'message' => 'Update user success'
-        ];
+        return $this->json(true, ['now' => date('d/m/Y'), 'user' => $user], 'Success');
     }
 
-    public function actionDelete($id){
-        // $id = Yii::$app->request->post('id');
+    public function actionDelete($id)
+    {
         $user = User::find()->where(['id' => $id])->one();
-        if(!$user){
-            return [
-                'status' => false,
-                'data' => [
-                    'now' => date('d/m/Y'),
-                ],
-                'message' => 'User dont exists'
-            ];
+        if (empty($user)) {
+            return $this->json(false, ['now' => date('d/m/Y')], 'Product not found', 404);
         }
 
-        if(!$user->delete()){
-            return $user->getErrors();
+        if (!$user->delete()) {
+            return $this->json(false, ['now' => date('d/m/Y')], 'Cant delete product', 400);
         };
-
-
-        return [
-            'status' => true,
-            'data' => [
-                'now' => date('d/m/Y'),
-            ],
-            'message' => 'Delete user success'
-        ];
+        return $this->json(true, ['now' => date('d/m/Y'), 'user' => $user], 'Success');
     }
 
 
-        // public function actionCreate(){
+    // public function actionCreate(){
     //     $user = new User();
     //     $data = Yii::$app->request->post();
     //     $username = $data['username'];

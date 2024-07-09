@@ -8,8 +8,10 @@ use app\controllers\Controller;
 use Yii;
 use yii\data\ActiveDataProvider;
 
-class CategoryProductController extends Controller{
-    public function actionIndex(){
+class CategoryProductController extends Controller
+{
+    public function actionIndex()
+    {
         $query = CategoryProduct::find();
 
         $dataProvider = new ActiveDataProvider([
@@ -24,17 +26,17 @@ class CategoryProductController extends Controller{
             ]
         ]);
 
-        return $this->json(true, ["category_product"=> $dataProvider->getModels()], "Success");
+        return $this->json(true, ["category_product" => $dataProvider->getModels()], "Success");
     }
 
-    public function actionCreate(){
+    public function actionCreate()
+    {
         $categoryProductForm = new CategoryProductForm();
         $categoryProductForm->load(Yii::$app->request->post());
 
-        if(!$categoryProductForm->validate() || !$categoryProductForm->save()){
-            return $this->json(false, ["errors" => $categoryProductForm->getErrors()], "Can't create category product");
-            // return $categoryProductForm->getErrors();
+        if (!$categoryProductForm->validate() || !$categoryProductForm->save()) {
+            return $this->json(false, ["errors" => $categoryProductForm->getErrors()], "Can't create category product", 400);
         }
-        return $this->json(true, ["category_product"=> $categoryProductForm], "Create category product successfully");
+        return $this->json(true, ["category_product" => $categoryProductForm], "Create category product successfully");
     }
 }
