@@ -21,6 +21,7 @@ class m240702_094501_create_user_table extends Migration
             'status' => $this->integer(),
             'created_at' => $this->dateTime(),
             'updated_at' => $this->dateTime(),
+            'deleted_at' => $this->dateTime(),
         ]);
     }
 

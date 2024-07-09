@@ -16,9 +16,11 @@ class m240702_094622_create_order_table extends Migration
             'id' => $this->primaryKey(),
             'user_id' => $this->integer(),
             'total' => $this->double(),
-            'status' => $this->integer(0),
+            'order_date' => $this->dateTime(),
+            'status' => $this->integer(),
             'created_at' => $this->dateTime(),
             'updated_at' => $this->dateTime(),
+            'deleted_at' => $this->dateTime(),
         ]);
 
         $this->addForeignKey('fk-order-user_id', 'order', 'user_id', 'user', 'id', 'CASCADE');

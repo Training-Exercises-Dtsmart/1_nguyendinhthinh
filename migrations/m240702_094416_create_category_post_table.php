@@ -13,10 +13,12 @@ class m240702_094416_create_category_post_table extends Migration
     public function safeUp()
     {
         $this->createTable('{{%category_post}}', [
-            'category_id' => $this->primaryKey(),
-            'category_name' => $this->string()->unique(),
+            'id' => $this->primaryKey(),
+            'name' => $this->string()->unique(),
+            'status' => $this->integer(),
             'created_at' => $this->dateTime(),
             'updated_at' => $this->dateTime(),
+            'deleted_at' => $this->dateTime(),
         ]);
     }
 

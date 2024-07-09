@@ -13,10 +13,12 @@ class m240702_094155_create_category_product_table extends Migration
     public function safeUp()
     {
         $this->createTable('{{%category_product}}', [
-            'category_id' => $this->primaryKey(),
-            'category_name' => $this->string()->notNull()->unique(),
+            'id' => $this->primaryKey(),
+            'name' => $this->string()->notNull()->unique(),
+            'status' => $this->integer(),
             'created_at' => $this->dateTime(),
             'updated_at' => $this->dateTime(),
+            'deleted_at' => $this->dateTime(),
         ]);
     }
 
