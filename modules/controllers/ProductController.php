@@ -2,12 +2,12 @@
 
 namespace app\modules\controllers;
 
+use Yii;
 use app\controllers\Controller;
 use app\modules\models\search\ProductSearch;
 use app\modules\models\Product;
 use app\models\form\ProductForm;
-use Yii;
-use yii\data\ActiveDataProvider;
+use app\modules\HTTP_STATUS;
 
 class ProductController extends Controller
 {
@@ -21,10 +21,9 @@ class ProductController extends Controller
     {
         $product = Product::find()->where(["id" => $id])->one();
         if (empty($product)) {
-            return $this->json(false, [], 'Product not found', 404);
+            return $this->json(false, [], 'Product not found', HTTP_STATUS::NOT_FOUND);
         }
-        $product->load(Yii::$app->request->post());
-        return $this->json(true, ["products" => $product]);
+        return $this->json(true, ["product" => $product]);
     }
 
 
@@ -33,9 +32,6 @@ class ProductController extends Controller
         $modelSearch = new ProductSearch();
         $dataProvider = $modelSearch->search(Yii::$app->request->getQueryParams());
 
-        if ($dataProvider->getCount() == 0) {
-            return $this->json(false, [], "Not found");
-        }
         return $this->json(true, ["products" => $dataProvider->getModels()], "Find successfully");
     }
 
@@ -45,7 +41,7 @@ class ProductController extends Controller
         $productForm->load(Yii::$app->request->post());
 
         if (!$productForm->validate() || !$productForm->save()) {
-            return $this->json(false, ["errors" => $productForm->getErrors()], "Can't create new product", 400);
+            return $this->json(false, ["errors" => $productForm->getErrors()], "Can't create new product", HTTP_STATUS::BAD_REQUEST);
         }
 
         return $this->json(true, ["product" => $productForm], "Create product successfully");
@@ -55,14 +51,13 @@ class ProductController extends Controller
     {
         $product = Product::find()->where(["id" => $id])->one();
         if (empty($product)) {
-            return $this->json(false, [], 'Product not found', 404);
+            return $this->json(false, [], 'Product not found', HTTP_STATUS::NOT_FOUND);
         }
 
         $product->load(Yii::$app->request->post());
         if (!$product->validate() || !$product->save()) {
-            return $this->json(false, ['errors' => $product->getErrors()], "Can't update product", 400);
+            return $this->json(false, ['errors' => $product->getErrors()], "Can't update product", HTTP_STATUS::BAD_REQUEST);
         }
-
         return $this->json(true, ['product' => $product], 'Update product successfully');
     }
 
@@ -70,15 +65,12 @@ class ProductController extends Controller
     {
         $product = Product::find()->where(["id" => $id])->one();
         if (empty($product)) {
-            return $this->json(false, [], "Product not found", 404);
+            return $this->json(false, [], "Product not found", HTTP_STATUS::NOT_FOUND);
         }
 
-        $product->load(Yii::$app->request->post());
         if (!$product->delete()) {
-            return $this->json(false, ['errors' => $product->getErrors()], "Can't delete product", 400);
+            return $this->json(false, ['errors' => $product->getErrors()], "Can't delete product", HTTP_STATUS::BAD_REQUEST);
         }
-
         return $this->json(true, [], 'Delete product successfully');
-
     }
 }
