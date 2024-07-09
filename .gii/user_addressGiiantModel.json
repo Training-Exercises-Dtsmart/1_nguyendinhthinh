@@ -1,6 +1,6 @@
 {
     "tablename": {
-        "value": "address",
+        "value": "user_address",
         "name": "tableName"
     },
     "tableprefix": {
@@ -8,7 +8,7 @@
         "name": "tablePrefix"
     },
     "modelclass": {
-        "value": "Address",
+        "value": "UserAddress",
         "name": "modelClass"
     },
     "ns": {
