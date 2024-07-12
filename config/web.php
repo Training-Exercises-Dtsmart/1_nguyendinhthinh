@@ -1,5 +1,7 @@
 <?php
 
+use sizeg\jwt\Jwt;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
@@ -9,7 +11,7 @@ $config = [
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
     ],
     'components' => [
         'request' => [
@@ -23,8 +25,9 @@ $config = [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
+            'identityClass' => 'app\modules\models\User',
+            'enableAutoLogin' => false,
+            'enableSession' => false,
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -48,22 +51,23 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'enableStrictParsing' => false,
-            'rules' => [
-                // '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
-
-
-                // 'POST <controller:(user|product)>/create' => '<controller>/create',
-                // 'PUT,PATCH user/<id>' => 'user/update',
-                // 'DELETE user/<id>' => 'user/delete',
-
-
-            ],
+        ],
+        'weather' => [
+            'class' => 'app\components\WeatherComponent',
+            'apiKey' => '164c1b59d84e4c4ebe840550241007'
         ],
     ],
     'modules' => [
         'api' => app\modules\Module::class
     ],
+    // 'modules' => [
+    //     'v1' => [
+    //         'class' => 'app\modules\v1\Module',
+    //     ],
+    //     'v2' => [
+    //         'class' => 'app\modules\v2\Module',
+    //     ],
+    // ],
     'params' => $params,
 ];
 

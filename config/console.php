@@ -18,13 +18,13 @@ $config = [
             'enableI18N' => false,
             'skipTables' => ['system_db_migration', 'system_rbac_migration', 'migration'],
             'modelQueryNamespace' => 'app\models\query',
-            'modelBaseClass' =>  yii\db\ActiveRecord::class,
+            'modelBaseClass' => yii\db\ActiveRecord::class,
             'modelQueryBaseClass' => yii\db\ActiveQuery::class,
         ]
     ],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
         '@tests' => '@app/tests',
     ],
     'components' => [
@@ -40,6 +40,9 @@ $config = [
             ],
         ],
         'db' => $db,
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+        ],
     ],
     'params' => $params,
     /*
