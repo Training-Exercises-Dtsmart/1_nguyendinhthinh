@@ -53,14 +53,16 @@ class PostController extends Controller
 
     public function actionUpdate($id)
     {
-        $user = Yii::$app->user->identity;
         $post = Post::find()->where(['id' => $id])->one();
+
+        if (!Yii::$app->user->can('updatePost', ['post' => $post])) {
+            return $this->json(false, [], 'Permission denied', HTTP_STATUS::FORBIDDEN);
+        }
+
         if (empty($post)) {
             return $this->json(false, [], 'Post not found', HTTP_STATUS::NOT_FOUND);
         }
-        if ($post->user_id != $user->id) {
-            return $this->json(false, [], 'You do not have permission to access this resource', HTTP_STATUS::FORBIDDEN);
-        }
+
         $post->load(Yii::$app->request->post());
         if (!$post->validate() || !$post->save()) {
             return $this->json(false, ["errors" => $post->getErrors()], "Can't update post", HTTP_STATUS::BAD_REQUEST);
@@ -71,14 +73,20 @@ class PostController extends Controller
     public function actionDelete($id)
     {
         $post = Post::find()->where(["id" => $id])->one();
+        if (!Yii::$app->user->can('deletePost', ['post' => $post])) {
+            return $this->json(false, [], 'Permission denied', HTTP_STATUS::FORBIDDEN);
+        }
+
         if (empty($post)) {
             return $this->json(false, [], "Post not found", HTTP_STATUS::NOT_FOUND);
         }
 
-        $post->load(Yii::$app->request->post());
-        if (!$post->delete()) {
-            return $this->json(false, ['errors' => $post->getErrors()], "Can't delete post", HTTP_STATUS::BAD_REQUEST);
-        }
+        $post->status = Post::DELETE;
+        $post->save();
+//        if (!$post->delete()) {
+//            return $this->json(false, ['errors' => $post->getErrors()], "Can't delete post", HTTP_STATUS::BAD_REQUEST);
+//        }
+
         return $this->json(true, [], 'Delete post successfully');
     }
 
