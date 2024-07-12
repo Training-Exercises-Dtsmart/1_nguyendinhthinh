@@ -17,13 +17,17 @@ use \app\models\query\UserQuery;
  * @property string $password
  * @property string $fullname
  * @property string $telephone
+ * @property string $auth_key
  * @property integer $status
  * @property string $deleted_at
  * @property string $created_at
  * @property string $updated_at
  *
+ * @property \app\models\CategoryPost[] $categoryPosts
+ * @property \app\models\CategoryProduct[] $categoryProducts
  * @property \app\models\Order[] $orders
  * @property \app\models\Post[] $posts
+ * @property \app\models\Product[] $products
  * @property \app\models\UserAddress[] $userAddresses
  */
 abstract class User extends \yii\db\ActiveRecord
@@ -61,7 +65,7 @@ abstract class User extends \yii\db\ActiveRecord
             [['username', 'password'], 'required'],
             [['status'], 'integer'],
             [['deleted_at'], 'safe'],
-            [['username', 'password', 'fullname', 'telephone'], 'string', 'max' => 255],
+            [['username', 'password', 'fullname', 'telephone', 'auth_key'], 'string', 'max' => 255],
             [['username'], 'unique']
         ]);
     }
@@ -77,11 +81,28 @@ abstract class User extends \yii\db\ActiveRecord
             'password' => 'Password',
             'fullname' => 'Fullname',
             'telephone' => 'Telephone',
+            'auth_key' => 'Auth Key',
             'status' => 'Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'deleted_at' => 'Deleted At',
         ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategoryPosts()
+    {
+        return $this->hasMany(\app\models\CategoryPost::class, ['created_by' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategoryProducts()
+    {
+        return $this->hasMany(\app\models\CategoryProduct::class, ['created_by' => 'id']);
     }
 
     /**
@@ -98,6 +119,14 @@ abstract class User extends \yii\db\ActiveRecord
     public function getPosts()
     {
         return $this->hasMany(\app\models\Post::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProducts()
+    {
+        return $this->hasMany(\app\models\Product::class, ['created_by' => 'id']);
     }
 
     /**

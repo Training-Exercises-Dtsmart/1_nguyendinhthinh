@@ -6,6 +6,7 @@ namespace app\models\base;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use \app\models\query\ProductQuery;
 
@@ -21,10 +22,12 @@ use \app\models\query\ProductQuery;
  * @property integer $status
  * @property integer $category_product_id
  * @property string $deleted_at
+ * @property integer $created_by
  * @property string $created_at
  * @property string $updated_at
  *
  * @property \app\models\CategoryProduct $categoryProduct
+ * @property \app\models\User $createdBy
  * @property \app\models\OrderItem[] $orderItems
  * @property \app\models\ProductImage[] $productImages
  */
@@ -45,6 +48,10 @@ abstract class Product extends \yii\db\ActiveRecord
     public function behaviors()
     {
         $behaviors = parent::behaviors();
+        $behaviors['blameable'] = [
+            'class' => BlameableBehavior::class,
+            'updatedByAttribute' => false,
+    ];
         $behaviors['timestamp'] = [
             'class' => TimestampBehavior::class,
             'value' => (new \DateTime())->format('Y-m-d H:i:s'),
@@ -67,7 +74,8 @@ abstract class Product extends \yii\db\ActiveRecord
             [['deleted_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
             [['name'], 'unique'],
-            [['category_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\CategoryProduct::class, 'targetAttribute' => ['category_product_id' => 'id']]
+            [['category_product_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\CategoryProduct::class, 'targetAttribute' => ['category_product_id' => 'id']],
+            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\User::class, 'targetAttribute' => ['created_by' => 'id']]
         ]);
     }
 
@@ -85,6 +93,7 @@ abstract class Product extends \yii\db\ActiveRecord
             'thumbnail' => 'Thumbnail',
             'status' => 'Status',
             'category_product_id' => 'Category Product ID',
+            'created_by' => 'Created By',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'deleted_at' => 'Deleted At',
@@ -97,6 +106,14 @@ abstract class Product extends \yii\db\ActiveRecord
     public function getCategoryProduct()
     {
         return $this->hasOne(\app\models\CategoryProduct::class, ['id' => 'category_product_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCreatedBy()
+    {
+        return $this->hasOne(\app\models\User::class, ['id' => 'created_by']);
     }
 
     /**

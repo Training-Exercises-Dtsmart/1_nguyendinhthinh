@@ -6,6 +6,7 @@ namespace app\models\base;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use \app\models\query\CategoryPostQuery;
 
@@ -16,9 +17,11 @@ use \app\models\query\CategoryPostQuery;
  * @property string $name
  * @property integer $status
  * @property string $deleted_at
+ * @property integer $created_by
  * @property string $created_at
  * @property string $updated_at
  *
+ * @property \app\models\User $createdBy
  * @property \app\models\Post[] $posts
  */
 abstract class CategoryPost extends \yii\db\ActiveRecord
@@ -38,6 +41,10 @@ abstract class CategoryPost extends \yii\db\ActiveRecord
     public function behaviors()
     {
         $behaviors = parent::behaviors();
+        $behaviors['blameable'] = [
+            'class' => BlameableBehavior::class,
+            'updatedByAttribute' => false,
+    ];
         $behaviors['timestamp'] = [
             'class' => TimestampBehavior::class,
             'value' => (new \DateTime())->format('Y-m-d H:i:s'),
@@ -56,7 +63,8 @@ abstract class CategoryPost extends \yii\db\ActiveRecord
             [['status'], 'integer'],
             [['deleted_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
-            [['name'], 'unique']
+            [['name'], 'unique'],
+            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\User::class, 'targetAttribute' => ['created_by' => 'id']]
         ]);
     }
 
@@ -69,10 +77,19 @@ abstract class CategoryPost extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'status' => 'Status',
+            'created_by' => 'Created By',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'deleted_at' => 'Deleted At',
         ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCreatedBy()
+    {
+        return $this->hasOne(\app\models\User::class, ['id' => 'created_by']);
     }
 
     /**
