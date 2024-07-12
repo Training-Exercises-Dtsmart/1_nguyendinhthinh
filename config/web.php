@@ -56,6 +56,9 @@ $config = [
             'class' => 'app\components\WeatherComponent',
             'apiKey' => '164c1b59d84e4c4ebe840550241007'
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+        ],
     ],
     'modules' => [
         'api' => app\modules\Module::class
