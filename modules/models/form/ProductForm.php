@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models\form;
+namespace app\modules\models\form;
 
 use app\modules\models\Product;
 
@@ -10,12 +10,19 @@ class ProductForm extends Product
 
     public $imageFile;
 
-    public function rules()
+//    public function rules()
+//    {
+//        return array_merge(parent::rules(), [
+//                [['imageFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'png, jpg'],
+//            ]
+//        );
+//    }
+
+    public function rules(): array
     {
         return array_merge(parent::rules(), [
-                [['imageFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'png, jpg'],
-            ]
-        );
+            [['name', 'price', 'stock'], 'required'],
+        ]);
     }
 
     public function uploadImage()
