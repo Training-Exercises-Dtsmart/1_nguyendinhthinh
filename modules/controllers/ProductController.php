@@ -3,14 +3,27 @@
 namespace app\modules\controllers;
 
 use Yii;
+use yii\filters\auth\HttpBearerAuth;
 use app\controllers\Controller;
-use app\modules\models\search\ProductSearch;
-use app\modules\models\Product;
-use app\models\form\ProductForm;
 use app\modules\HTTP_STATUS;
+use app\modules\models\User;
+use app\modules\models\Product;
+use app\modules\models\form\ProductForm;
+use app\modules\models\search\ProductSearch;
 
 class ProductController extends Controller
 {
+
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['authenticator'] = [
+            'class' => HttpBearerAuth::class,
+            'except' => ['index', 'view'],
+        ];
+        return $behaviors;
+    }
+
     public function actionIndex()
     {
         $products = Product::find()->all();
@@ -37,13 +50,14 @@ class ProductController extends Controller
 
     public function actionCreate()
     {
+        $user = Yii::$app->user->identity;
         $productForm = new ProductForm();
         $productForm->load(Yii::$app->request->post());
+        $productForm->created_by = $user->id;
 
         if (!$productForm->validate() || !$productForm->save()) {
             return $this->json(false, ["errors" => $productForm->getErrors()], "Can't create new product", HTTP_STATUS::BAD_REQUEST);
         }
-
         return $this->json(true, ["product" => $productForm], "Create product successfully");
     }
 
