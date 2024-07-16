@@ -15,11 +15,16 @@ use \app\models\query\UserQuery;
  * @property integer $id
  * @property string $username
  * @property string $password
+ * @property string $email
  * @property string $fullname
  * @property string $telephone
  * @property string $auth_key
  * @property integer $status
  * @property string $deleted_at
+ * @property integer $allowance
+ * @property integer $allowance_updated_at
+ * @property integer $email_verified
+ * @property string $verification_token
  * @property string $created_at
  * @property string $updated_at
  *
@@ -63,9 +68,9 @@ abstract class User extends \yii\db\ActiveRecord
         $parentRules = parent::rules();
         return ArrayHelper::merge($parentRules, [
             [['username', 'password'], 'required'],
-            [['status'], 'integer'],
+            [['status', 'allowance', 'allowance_updated_at', 'email_verified'], 'integer'],
             [['deleted_at'], 'safe'],
-            [['username', 'password', 'fullname', 'telephone', 'auth_key'], 'string', 'max' => 255],
+            [['username', 'password', 'email', 'fullname', 'telephone', 'auth_key', 'verification_token'], 'string', 'max' => 255],
             [['username'], 'unique']
         ]);
     }
@@ -79,6 +84,7 @@ abstract class User extends \yii\db\ActiveRecord
             'id' => 'ID',
             'username' => 'Username',
             'password' => 'Password',
+            'email' => 'Email',
             'fullname' => 'Fullname',
             'telephone' => 'Telephone',
             'auth_key' => 'Auth Key',
@@ -86,6 +92,10 @@ abstract class User extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'deleted_at' => 'Deleted At',
+            'allowance' => 'Allowance',
+            'allowance_updated_at' => 'Allowance Updated At',
+            'email_verified' => 'Email Verified',
+            'verification_token' => 'Verification Token',
         ]);
     }
 

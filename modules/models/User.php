@@ -5,10 +5,15 @@ namespace app\modules\models;
 use Yii;
 use yii\base\Exception;
 use app\models\User as BaseUser;
+use yii\filters\RateLimitInterface;
 use yii\web\IdentityInterface;
 
-class User extends BaseUser implements IdentityInterface
+class User extends BaseUser implements IdentityInterface, RateLimitInterface
 {
+    public $rateLimit = 5; // Ví dụ: 100 requests per second
+    public $allowance;
+    public $allowance_updated_at;
+
     const SECRET_KEY = "dinhthinh";
 
     public function getId()
@@ -36,7 +41,6 @@ class User extends BaseUser implements IdentityInterface
 
     public static function findIdentity($id)
     {
-        // TODO: Implement findIdentity() method.
         return static::findOne($id);
     }
 
@@ -48,5 +52,55 @@ class User extends BaseUser implements IdentityInterface
     public function findByUsername($username)
     {
         return static::findOne(['username' => $username]);
+    }
+
+    public function generateVerificationToken()
+    {
+        $this->verification_token = Yii::$app->security->generateRandomString() . '_' . time();
+    }
+
+    public static function findByVerificationToken($token)
+    {
+        if (!static::isVerificationTokenValid($token)) {
+            return null;
+        }
+        return static::findOne([
+            'verification_token' => $token,
+            'email_verified' => 0,
+        ]);
+    }
+
+    public static function isVerificationTokenValid($token)
+    {
+        $expire = Yii::$app->params['user.verificationTokenExpire'];
+        $parts = explode('_', $token);
+        $timestamp = (int)end($parts);
+        return $timestamp + $expire >= time();
+    }
+
+    public function verifyEmail()
+    {
+        $this->email_verified = 1;
+        $this->verification_token = null;
+    }
+
+    public function getRateLimit($request, $action)
+    {
+        return [$this->rateLimit, 60]; // $rateLimit requests per second
+    }
+
+    public function loadAllowance($request, $action)
+    {
+        return [$this->allowance, $this->allowance_updated_at];
+    }
+
+    public function saveAllowance($request, $action, $allowance, $timestamp)
+    {
+        $this->allowance = $allowance;
+        $this->allowance_updated_at = $timestamp;
+        if ($this->save()) {
+            var_dump(111);
+        }
+//        $this->save(false);
     }
 }
