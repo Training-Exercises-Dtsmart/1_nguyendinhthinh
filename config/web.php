@@ -1,6 +1,6 @@
 <?php
 
-use sizeg\jwt\Jwt;
+use yii\filters\RateLimiter;
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
@@ -8,7 +8,7 @@ $db = require __DIR__ . '/db.php';
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'queue'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
@@ -21,23 +21,58 @@ $config = [
                 'application/json' => 'yii\web\JsonParser',
             ]
         ],
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
-        ],
+//        'cache' => [
+//            'class' => 'yii\caching\FileCache',
+//        ],
+//        'cache' => [
+//            'class' => 'yii\caching\MemCache',
+//            'servers' => [
+//                [
+//                    'host' => 'server1',
+//                    'port' => 11211,
+//                    'weight' => 100,
+//                ],
+//                [
+//                    'host' => 'server2',
+//                    'port' => 11211,
+//                    'weight' => 50,
+//                ],
+//            ],
+//        ],
+
         'user' => [
             'identityClass' => 'app\modules\models\User',
             'enableAutoLogin' => false,
             'enableSession' => false,
+            'loginUrl' => null,
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'mailer' => [
-            'class' => \yii\symfonymailer\Mailer::class,
-            'viewPath' => '@app/mail',
-            // send all mails to a file by default.
-            'useFileTransport' => true,
+//        'mailer' => [
+//            'class' => \yii\symfonymailer\Mailer::class,
+//            'viewPath' => '@app/mail',
+//            // send all mails to a file by default.
+//            'useFileTransport' => true,
+//        ],
+        'queue' => [
+            'class' => \yii\queue\file\Queue::class,
+            'path' => '@runtime/queue',
         ],
+
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'useFileTransport' => false,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'encryption' => 'tls',
+                'host' => 'smtp.gmail.com',
+                'port' => '587',
+                'username' => 'kissuot6@gmail.com',
+                'password' => 'aopo elpa bfyy tdgp',
+            ],
+        ],
+
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -59,6 +94,10 @@ $config = [
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
         ],
+
+    ],
+    'as rateLimiter' => [
+        'class' => RateLimiter::class,
     ],
     'modules' => [
         'api' => app\modules\Module::class

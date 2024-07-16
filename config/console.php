@@ -1,12 +1,14 @@
 <?php
 
+use yii\queue\file\Queue;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic-console',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'queue'],
     'controllerNamespace' => 'app\commands',
     'controllerMap' => [
         'batch' => [
@@ -31,6 +33,18 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'useFileTransport' => false,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'encryption' => 'tls',
+                'host' => 'smtp.gmail.com',
+                'port' => '587',
+                'username' => 'kissuot6@gmail.com',
+                'password' => 'aopo elpa bfyy tdgp',
+            ],
+        ],
         'log' => [
             'targets' => [
                 [
@@ -42,6 +56,10 @@ $config = [
         'db' => $db,
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
+        ],
+        'queue' => [
+            'class' => Queue::class,
+            'path' => '@runtime/queue',
         ],
     ],
     'params' => $params,

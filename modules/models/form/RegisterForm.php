@@ -12,8 +12,7 @@ class RegisterForm extends User
     {
         return array_merge(parent::rules(), [
             ['username', 'trim'],
-            [['username', 'password', 're_password'], 'required'],
-            ['re_password', 'compare', 'compareAttribute' => 'password'],
+            [['username', 'password', 'email'], 'required'],
         ]);
     }
 }

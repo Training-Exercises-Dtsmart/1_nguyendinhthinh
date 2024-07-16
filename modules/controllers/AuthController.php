@@ -52,15 +52,44 @@ class AuthController extends Controller
         }
 
         $registerForm->password = Yii::$app->getSecurity()->generatePasswordHash($registerForm->password);
-        $registerForm->re_password = $registerForm->password;
+        $registerForm->generateVerificationToken();
+
         if (!$registerForm->save()) {
             return $this->json(false, ['errors' => $registerForm->getErrors()], 'Cant register.', HTTP_STATUS::BAD_REQUEST);
         }
+        $this->sendVerificationEmail($registerForm);
 
         $auth = Yii::$app->authManager;
         $author = $auth->getRole('author');
         $auth->assign($author, $registerForm->id);
 
         return $this->json(true, ['user' => $registerForm], 'Register Successfully', HTTP_STATUS::OK);
+    }
+
+    public function sendVerificationEmail($registerForm): bool
+    {
+        $verifyLink = Yii::$app->urlManager->createAbsoluteUrl(['/verify-email', 'token' => $registerForm->verification_token]);
+
+        return Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
+                ['user' => $registerForm, 'verifyLink' => $verifyLink]  // Pass the verifyLink to the template
+            )
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+            ->setTo($registerForm->email)  // Use $user->email to avoid issues if $this->email is not set
+            ->setSubject('Email verification for ' . Yii::$app->name)
+            ->send();
+
+//        return Yii::$app
+//            ->mailer
+//            ->compose(
+//                ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
+//                ['user' => $registerForm]
+//            )
+//            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+//            ->setTo($registerForm->email)
+//            ->setSubject('Email verification for ' . Yii::$app->name)
+//            ->send();
     }
 }
