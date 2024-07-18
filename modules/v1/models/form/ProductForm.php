@@ -1,8 +1,8 @@
 <?php
 
-namespace app\modules\models\form;
+namespace app\modules\v1\models\form;
 
-use app\modules\models\Product;
+use app\modules\v1\models\Product;
 
 
 class ProductForm extends Product

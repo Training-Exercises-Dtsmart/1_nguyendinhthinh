@@ -1,9 +1,9 @@
 <?php
 
-namespace app\modules\controllers;
+namespace app\modules\v1\controllers;
 
-use Yii;
 use app\controllers\Controller;
+use Yii;
 
 class WeatherController extends Controller
 {

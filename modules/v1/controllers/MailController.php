@@ -1,10 +1,10 @@
 <?php
 
-namespace app\modules\controllers;
+namespace app\modules\v1\controllers;
 
-use Yii;
 use app\controllers\Controller;
-use app\modules\jobs\TestQueue;
+use app\modules\v1\jobs\TestQueue;
+use Yii;
 
 class MailController extends Controller
 {

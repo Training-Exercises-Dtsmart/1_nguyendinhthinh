@@ -1,13 +1,15 @@
 <?php
 
-namespace app\modules\controllers;
+namespace app\modules\v1\controllers;
 
-use Yii;
 use app\controllers\Controller;
-use app\modules\models\Post;
-use app\modules\models\form\PostForm;
-use app\modules\models\search\PostSearch;
 use app\modules\HTTP_STATUS;
+use app\modules\v1\jobs\TestQueue;
+use app\modules\v1\models\form\PostForm;
+use app\modules\v1\models\Post;
+use app\modules\v1\models\queue\SendMailJob;
+use app\modules\v1\models\search\PostSearch;
+use Yii;
 use yii\filters\auth\HttpBearerAuth;
 
 class PostController extends Controller
@@ -17,9 +19,53 @@ class PostController extends Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::class,
-            'except' => ['index', 'view', 'search'],
+            'except' => ['view', 'search', 'sendmail', 'sendmail-queue', 'job', 'queue'],
         ];
+//        $behaviors['rateLimiter']['enableRateLimitHeaders'] = false;
+        $behaviors['rateLimiter']['enableRateLimitHeaders'] = true;
         return $behaviors;
+    }
+
+    public function actionSendmailQueue()
+    {
+        $job = new SendMailJob();
+        Yii::$app->queue->push($job);
+        return $this->json(true, [], 'Queue successfully sent');
+    }
+
+    public function actionQueue()
+    {
+        Yii::$app->queue->push(new TestQueue('abc'));
+    }
+
+    public function actionJob()
+    {
+        $job = new TestQueue('dinhthinh');
+        Yii::$app->queue->push($job);
+        return $this->json();
+    }
+
+    public function actionSendmail()
+    {
+        //Send mail
+        Yii::$app->mailer->compose()
+            ->setFrom('from@example.com')
+            ->setTo('toan70868@gmail.com')
+            ->setSubject('Link queue')
+            ->setTextBody('Mail: https://voixanh.net/post/28/gui-mail-trong-yii2-framework-p13')
+            ->setHtmlBody('<b>Queue: https://voixanh.net/post/29/tim-hieu-ve-queue-trong-yii2-framework-p14</b>')
+            ->send();
+
+//        $messages = [];
+//        $user = 'kissuot2@gmail.com';
+//        for ($i = 0; $i < 100; $i++) {
+//            $messages[] = Yii::$app->mailer->compose()
+//                ->setFrom('yii-basic@gmail.com')
+//                ->setTo($user)
+//                ->setSubject('Demo gửi multi mail trong Yii2')
+//                ->setHtmlBody('<b>Nội dung gửi multi mail trong Yii2</b>');
+//        }
+//        Yii::$app->mailer->sendMultiple($messages);
     }
 
     public function actionIndex()

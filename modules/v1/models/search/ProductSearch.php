@@ -1,8 +1,8 @@
 <?php
 
-namespace app\modules\models\search;
+namespace app\modules\v1\models\search;
 
-use app\modules\models\Product;
+use app\modules\v1\models\Product;
 use yii\data\ActiveDataProvider;
 
 class ProductSearch extends Product

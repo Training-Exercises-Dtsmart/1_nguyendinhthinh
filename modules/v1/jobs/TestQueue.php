@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\jobs;
+namespace app\modules\v1\jobs;
 
 use yii\base\BaseObject;
 use yii\queue\RetryableJobInterface;

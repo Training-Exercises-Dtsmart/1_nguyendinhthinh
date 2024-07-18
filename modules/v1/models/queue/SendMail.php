@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\models\queue;
+namespace app\modules\v1\models\queue;
 
 use Yii;
 use yii\base\BaseObject;

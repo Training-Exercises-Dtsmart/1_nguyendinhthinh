@@ -1,16 +1,14 @@
 <?php
 
-namespace app\modules\controllers;
+namespace app\modules\v1\controllers;
 
-use Yii;
-use yii\filters\auth\HttpBearerAuth;
 use app\controllers\Controller;
 use app\modules\HTTP_STATUS;
-use app\modules\models\User;
-use app\modules\models\Product;
-use app\modules\models\form\ProductForm;
-use app\modules\models\search\ProductSearch;
-use yii\rest\Serializer;
+use app\modules\v1\models\form\ProductForm;
+use app\modules\v1\models\Product;
+use app\modules\v1\models\search\ProductSearch;
+use Yii;
+use yii\filters\auth\HttpBearerAuth;
 use yii\web\UploadedFile;
 
 class ProductController extends Controller

@@ -1,10 +1,10 @@
 <?php
 
-namespace app\modules\models;
+namespace app\modules\v1\models;
 
+use app\models\User as BaseUser;
 use Yii;
 use yii\base\Exception;
-use app\models\User as BaseUser;
 use yii\filters\RateLimitInterface;
 use yii\web\IdentityInterface;
 

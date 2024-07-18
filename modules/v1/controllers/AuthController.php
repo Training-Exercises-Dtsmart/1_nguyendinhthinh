@@ -1,15 +1,14 @@
 <?php
 
-namespace app\modules\controllers;
+namespace app\modules\v1\controllers;
 
-use Yii;
 use app\controllers\Controller;
-use app\modules\models\User;
-use app\modules\models\form\LoginForm;
-use app\modules\models\form\UserForm;
-use app\modules\models\form\RegisterForm;
-use app\modules\jobs\VerifyMailQueue;
 use app\modules\HTTP_STATUS;
+use app\modules\v1\jobs\VerifyMailQueue;
+use app\modules\v1\models\form\LoginForm;
+use app\modules\v1\models\form\RegisterForm;
+use app\modules\v1\models\User;
+use Yii;
 
 class AuthController extends Controller
 {

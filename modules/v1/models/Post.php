@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\models;
+namespace app\modules\v1\models;
 
 use app\models\Post as BasePost;
 

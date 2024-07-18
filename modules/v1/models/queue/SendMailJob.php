@@ -1,9 +1,8 @@
 <?php
 
-namespace app\modules\models\queue;
+namespace app\modules\v1\models\queue;
 
 use Yii;
-use yii\base\BaseObject;
 use yii\queue\JobInterface;
 
 class SendMailJob implements JobInterface

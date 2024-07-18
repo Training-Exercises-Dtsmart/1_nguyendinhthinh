@@ -1,8 +1,8 @@
 <?php
 
-namespace app\modules\models\form;
+namespace app\modules\v1\models\form;
 
-use app\modules\models\User;
+use app\modules\v1\models\User;
 
 class RegisterForm extends User
 {

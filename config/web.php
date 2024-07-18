@@ -21,9 +21,9 @@ $config = [
                 'application/json' => 'yii\web\JsonParser',
             ]
         ],
-//        'cache' => [
-//            'class' => 'yii\caching\FileCache',
-//        ],
+        'cache' => [
+            'class' => 'yii\caching\FileCache',
+        ],
 //        'cache' => [
 //            'class' => 'yii\caching\MemCache',
 //            'servers' => [
@@ -41,7 +41,7 @@ $config = [
 //        ],
 
         'user' => [
-            'identityClass' => 'app\modules\models\User',
+            'identityClass' => 'app\modules\v1\models\User',
             'enableAutoLogin' => false,
             'enableSession' => false,
             'loginUrl' => null,
@@ -99,8 +99,18 @@ $config = [
     'as rateLimiter' => [
         'class' => RateLimiter::class,
     ],
+//    'modules' => [
+//        'api' => app\modules\Module::class
+//    ],
     'modules' => [
-        'api' => app\modules\Module::class
+        'api' => [
+            'class' => 'yii\base\Module',
+            'modules' => [
+                'v1' => [
+                    'class' => 'app\modules\v1\Module',
+                ],
+            ],
+        ],
     ],
     // 'modules' => [
     //     'v1' => [

@@ -1,10 +1,10 @@
 <?php
 
-namespace app\modules\controllers;
+namespace app\modules\v1\controllers;
 
-use Yii;
 use app\controllers\Controller;
-use app\modules\models\form\CategoryPostForm;
+use app\modules\v1\models\form\CategoryPostForm;
+use Yii;
 use yii\filters\auth\HttpBearerAuth;
 
 class CategoryPostController extends Controller

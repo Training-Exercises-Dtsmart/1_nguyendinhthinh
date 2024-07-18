@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\models\form;
+namespace app\modules\v1\models\form;
 
 use app\models\CategoryPost;
 
