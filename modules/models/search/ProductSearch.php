@@ -21,6 +21,9 @@ class ProductSearch extends Product
     public function search($params)
     {
         $query = Product::find()->joinWith('categoryProduct');
+//        \Yii::$container->set('yii\data\Pagination', [
+//            'pageSizeLimit' => [1, 5],
+//        ]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -39,7 +42,6 @@ class ProductSearch extends Product
         $query->andFilterWhere(["or", ["LIKE", "product.name", $this->keyword],
             ["LIKE", "category_product.name", $this->category_product_name],
             ["LIKE", "category_product.name", $this->keyword],]);
-
         return $dataProvider;
 
     }

@@ -10,6 +10,8 @@ use app\modules\models\User;
 use app\modules\models\Product;
 use app\modules\models\form\ProductForm;
 use app\modules\models\search\ProductSearch;
+use yii\rest\Serializer;
+use yii\web\UploadedFile;
 
 class ProductController extends Controller
 {
@@ -26,17 +28,24 @@ class ProductController extends Controller
 
     public function actionIndex()
     {
-        $products = Product::find()->all();
+        $cache = Yii::$app->cache;
+        $key = 'product-list';
+        $products = $cache->get($key);
+        if ($products == false) {
+            $products = Product::find()->all();
+            $cache->set($key, $products, 6000);
+        }
+
         return $this->json(true, ["products" => $products]);
     }
 
     public function actionView($id)
     {
         $product = Product::find()->where(["id" => $id])->one();
-        if (empty($product)) {
-            return $this->json(false, [], 'Product not found', HTTP_STATUS::NOT_FOUND);
+        if ($product) {
+            return $this->json(true, ["product" => $product]);
         }
-        return $this->json(true, ["product" => $product]);
+        return $this->json(false, [], 'Product not found', HTTP_STATUS::NOT_FOUND);
     }
 
 
@@ -53,26 +62,35 @@ class ProductController extends Controller
         $user = Yii::$app->user->identity;
         $productForm = new ProductForm();
         $productForm->load(Yii::$app->request->post());
-        $productForm->created_by = $user->id;
 
-        if (!$productForm->validate() || !$productForm->save()) {
+        if ($productForm->validate()) {
+            $productForm->thumbnail = UploadedFile::getInstancesByName('thumbnail');
+            foreach ($productForm->thumbnail as $file) {
+                var_dump($file);
+            }
+            die;
+            $productForm->created_by = $user->id;
+
+            if ($productForm->save()) {
+                return $this->json(true, ["product" => $productForm], "Create product successfully");
+            }
             return $this->json(false, ["errors" => $productForm->getErrors()], "Can't create new product", HTTP_STATUS::BAD_REQUEST);
         }
-        return $this->json(true, ["product" => $productForm], "Create product successfully");
+        return $this->json(false, ["errors" => $productForm->getErrors()], "Validation failed", HTTP_STATUS::BAD_REQUEST);
     }
 
     public function actionUpdate($id)
     {
         $product = Product::find()->where(["id" => $id])->one();
-        if (empty($product)) {
+        if (!$product) {
             return $this->json(false, [], 'Product not found', HTTP_STATUS::NOT_FOUND);
         }
 
         $product->load(Yii::$app->request->post());
-        if (!$product->validate() || !$product->save()) {
-            return $this->json(false, ['errors' => $product->getErrors()], "Can't update product", HTTP_STATUS::BAD_REQUEST);
+        if ($product->validate() && $product->save()) {
+            return $this->json(true, ['product' => $product], 'Update product successfully');
         }
-        return $this->json(true, ['product' => $product], 'Update product successfully');
+        return $this->json(false, ['errors' => $product->getErrors()], "Can't update product", HTTP_STATUS::BAD_REQUEST);
     }
 
     public function actionDelete($id)
