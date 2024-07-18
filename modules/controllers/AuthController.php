@@ -3,12 +3,13 @@
 namespace app\modules\controllers;
 
 use Yii;
-use app\modules\models\form\RegisterForm;
-use app\modules\HTTP_STATUS;
+use app\controllers\Controller;
 use app\modules\models\User;
 use app\modules\models\form\LoginForm;
 use app\modules\models\form\UserForm;
-use app\controllers\Controller;
+use app\modules\models\form\RegisterForm;
+use app\modules\jobs\VerifyMailQueue;
+use app\modules\HTTP_STATUS;
 
 class AuthController extends Controller
 {
@@ -17,7 +18,7 @@ class AuthController extends Controller
         $loginForm = new LoginForm();
         $loginForm->load(Yii::$app->request->post());
 
-        if (!$loginForm->validate()) {
+        if (!$loginForm->validate() && !$loginForm->login()) {
             return $this->json(false, [], 'Validation failed. Please check the input and try again.', HTTP_STATUS::BAD_REQUEST);
         }
 
@@ -53,10 +54,12 @@ class AuthController extends Controller
 
         $registerForm->password = Yii::$app->getSecurity()->generatePasswordHash($registerForm->password);
         $registerForm->generateVerificationToken();
+        $registerForm->email_verified = RegisterForm::EMAIL_VERIFY_PENDING;
 
         if (!$registerForm->save()) {
             return $this->json(false, ['errors' => $registerForm->getErrors()], 'Cant register.', HTTP_STATUS::BAD_REQUEST);
         }
+
         $this->sendVerificationEmail($registerForm);
 
         $auth = Yii::$app->authManager;
@@ -66,30 +69,25 @@ class AuthController extends Controller
         return $this->json(true, ['user' => $registerForm], 'Register Successfully', HTTP_STATUS::OK);
     }
 
-    public function sendVerificationEmail($registerForm): bool
+    public function sendVerificationEmail($registerForm)
     {
-        $verifyLink = Yii::$app->urlManager->createAbsoluteUrl(['/verify-email', 'token' => $registerForm->verification_token]);
+        $verifyLink = Yii::$app->urlManager->createAbsoluteUrl(['/api/v1/auth/verify-email', 'token' => $registerForm->verification_token]);
 
-        return Yii::$app
-            ->mailer
-            ->compose(
-                ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
-                ['user' => $registerForm, 'verifyLink' => $verifyLink]  // Pass the verifyLink to the template
-            )
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
-            ->setTo($registerForm->email)  // Use $user->email to avoid issues if $this->email is not set
-            ->setSubject('Email verification for ' . Yii::$app->name)
-            ->send();
+        Yii::$app->queue->push(new VerifyMailQueue($registerForm, $verifyLink));
+    }
 
-//        return Yii::$app
-//            ->mailer
-//            ->compose(
-//                ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
-//                ['user' => $registerForm]
-//            )
-//            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
-//            ->setTo($registerForm->email)
-//            ->setSubject('Email verification for ' . Yii::$app->name)
-//            ->send();
+    public function actionVerifyEmail($token)
+    {
+        try {
+            $user = User::findByVerificationToken($token);
+            if (!$user) {
+                return $this->json(false, [], 'Verification token is invalid or expired. Please request again.');
+            }
+            $user->verifyEmail();
+            $user->save(false);
+            return $this->json(true, [], 'Your email has been confirmed!');
+        } catch (\RuntimeException $e) {
+            return $this->json(false, [], $e->getMessage());
+        }
     }
 }

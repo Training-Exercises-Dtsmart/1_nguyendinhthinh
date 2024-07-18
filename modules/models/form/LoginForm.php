@@ -12,6 +12,7 @@ class LoginForm extends User
             [['username', 'password'], 'required'],
         ];
     }
+    
 
     public function formName()
     {
