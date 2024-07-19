@@ -13,5 +13,8 @@ use \app\models\Product;
  */
 class ProductQuery extends \yii\db\ActiveQuery
 {
-
+    public function active()
+    {
+        return $this->andWhere(["!=", "product.status", Product::STATUS_DELETE]);
+    }
 }

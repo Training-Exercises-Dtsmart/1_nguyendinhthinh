@@ -2,14 +2,17 @@
 
 namespace app\modules\v1\controllers;
 
+use Yii;
+use yii\db\Exception;
+use yii\filters\AccessControl;
+use yii\web\UploadedFile;
+use yii\filters\auth\HttpBearerAuth;
 use app\controllers\Controller;
 use app\modules\HTTP_STATUS;
-use app\modules\v1\models\form\ProductForm;
 use app\modules\v1\models\Product;
+use app\modules\v1\models\ProductImage;
+use app\modules\v1\models\form\ProductForm;
 use app\modules\v1\models\search\ProductSearch;
-use Yii;
-use yii\filters\auth\HttpBearerAuth;
-use yii\web\UploadedFile;
 
 class ProductController extends Controller
 {
@@ -30,8 +33,9 @@ class ProductController extends Controller
         $key = 'product-list';
         $products = $cache->get($key);
         if ($products == false) {
-            $products = Product::find()->all();
-            $cache->set($key, $products, 6000);
+            $searchModel = new ProductSearch();
+            $products = $searchModel->search(Yii::$app->request->queryParams);
+            $cache->set($key, $products, 10);
         }
 
         return $this->json(true, ["products" => $products]);
@@ -51,7 +55,6 @@ class ProductController extends Controller
     {
         $modelSearch = new ProductSearch();
         $dataProvider = $modelSearch->search(Yii::$app->request->getQueryParams());
-
         return $this->json(true, ["products" => $dataProvider->getModels()], "Find successfully");
     }
 
@@ -62,45 +65,57 @@ class ProductController extends Controller
         $productForm->load(Yii::$app->request->post());
 
         if ($productForm->validate()) {
-            $productForm->thumbnail = UploadedFile::getInstancesByName('thumbnail');
-            foreach ($productForm->thumbnail as $file) {
-                var_dump($file);
-            }
-            die;
-            $productForm->created_by = $user->id;
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $productForm->created_by = $user->id;
+                $productForm->save();
+                $productImage = new ProductImage();
+                $productImage->product_id = $productForm->id;
+                $productImage->imageFiles = UploadedFile::getInstancesByName('images');
+                if (!$productImage->validate()) {
+                    throw new Exception($productImage->getFirstError('imageFiles'));
+                }
 
-            if ($productForm->save()) {
+                if (!$productImage->uploadFile()) {
+                    throw new Exception("Cant upload image file");
+                };
+
+                $transaction->commit();
                 return $this->json(true, ["product" => $productForm], "Create product successfully");
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                return $this->json(false, ["errors" => $e->getMessage()], 'Cant create new product');
             }
-            return $this->json(false, ["errors" => $productForm->getErrors()], "Can't create new product", HTTP_STATUS::BAD_REQUEST);
         }
         return $this->json(false, ["errors" => $productForm->getErrors()], "Validation failed", HTTP_STATUS::BAD_REQUEST);
     }
 
-    public function actionUpdate($id)
+    public function actionUpdate($id): array
     {
-        $product = Product::find()->where(["id" => $id])->one();
-        if (!$product) {
+        $productForm = ProductForm::find()->where(["id" => $id])->one();
+        if (!$productForm) {
             return $this->json(false, [], 'Product not found', HTTP_STATUS::NOT_FOUND);
         }
-
-        $product->load(Yii::$app->request->post());
-        if ($product->validate() && $product->save()) {
-            return $this->json(true, ['product' => $product], 'Update product successfully');
+        $productForm->load(Yii::$app->request->post());
+        if (!$productForm->validate() || !$productForm->save()) {
+            return $this->json(false, ['errors' => $productForm->getErrors()], "Can't update product", HTTP_STATUS::BAD_REQUEST);
         }
-        return $this->json(false, ['errors' => $product->getErrors()], "Can't update product", HTTP_STATUS::BAD_REQUEST);
+        return $this->json(true, ['product' => $productForm], 'Update product successfully');
     }
 
     public function actionDelete($id)
     {
         $product = Product::find()->where(["id" => $id])->one();
-        if (empty($product)) {
+        if (!$product) {
             return $this->json(false, [], "Product not found", HTTP_STATUS::NOT_FOUND);
         }
 
-        if (!$product->delete()) {
-            return $this->json(false, ['errors' => $product->getErrors()], "Can't delete product", HTTP_STATUS::BAD_REQUEST);
+        $product->status = Product::STATUS_DELETE;
+        $product->deleted_at = date('Y-m-d H:i:s');
+        if ($product->save()) {
+            return $this->json(true, [], 'Delete product successfully');
         }
-        return $this->json(true, [], 'Delete product successfully');
+
+        return $this->json(false, ['errors' => $product->getErrors()], "Can't delete product", HTTP_STATUS::BAD_REQUEST);
     }
 }

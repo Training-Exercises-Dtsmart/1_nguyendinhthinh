@@ -10,29 +10,17 @@ class ProductForm extends Product
 
     public $imageFile;
 
-//    public function rules()
-//    {
-//        return array_merge(parent::rules(), [
-//                [['imageFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'png, jpg'],
-//            ]
-//        );
-//    }
-
     public function rules(): array
     {
         return array_merge(parent::rules(), [
             [['name', 'price', 'stock'], 'required'],
+            ['name', 'unique'],
+            ['name', 'string', 'max' => 255],
         ]);
     }
 
     public function uploadImage()
     {
-//        if ($this->validate()) {
-//            $this->imageFile->saveAs("uploads/".$this->imageFile->baseName . '.' . $this->imageFile->extension);
-//            return true;
-//        } else {
-//            return false;
-//        }
         if ($this->imageFile->saveAs("uploads/" . $this->imageFile->baseName . '.' . $this->imageFile->extension)) {
             return true;
         }
