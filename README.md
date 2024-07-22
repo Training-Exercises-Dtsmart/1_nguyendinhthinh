@@ -1,4 +1,4 @@
-<h3>Day 1:</h3>
+<h3 align="center">Day 1:</h3>
 
 <h4>Calculate/total:</h4>
 
@@ -28,7 +28,7 @@
 
 ![image](https://github.com/Training-Exercises-Dtsmart/1_nguyendinhthinh/assets/95834842/a00bcca5-ebd7-4f3c-aa84-93a0e5d9c6f3)
 
-<h3>Day 2:</h3>
+<h3 align="center">Day 2:</h3>
 
 <h4>Schema Database:</h4>
   
@@ -38,7 +38,7 @@
   
 ![Migration](https://github.com/Training-Exercises-Dtsmart/1_nguyendinhthinh/assets/95834842/10ed017b-60f2-4159-96dd-4c37432a7a59)
 
-<h3>Day 3:</h3>
+<h3 align="center">Day 3:</h3>
 
 <h4>Config console use gii:</h4>
   
@@ -57,7 +57,7 @@
 
 ![image](https://github.com/Training-Exercises-Dtsmart/1_nguyendinhthinh/assets/95834842/e3cf7034-0756-470c-ad5c-8df81e02f05e)
 
-<h3>Day 4:</h3>
+<h3 align="center">Day 4:</h3>
 <h4>Filter(category_name) and SearchModel:<h4>
 
 ![image](https://github.com/Training-Exercises-Dtsmart/1_nguyendinhthinh/assets/95834842/9478608c-2047-4695-89b2-5b809030665f)
@@ -71,7 +71,7 @@
 ![image](https://github.com/Training-Exercises-Dtsmart/1_nguyendinhthinh/assets/95834842/81081dbe-db28-4e82-8909-7724deb5c028)
 
 
-<h3>Day 5:</h3>
+<h3 align="center">Day 5:</h3>
 <h4>Module:<h4>
 
 ![image](https://github.com/Training-Exercises-Dtsmart/1_nguyendinhthinh/assets/95834842/b9906992-a174-488c-a94c-90e4cb081c30)
@@ -119,4 +119,80 @@
 ![image](https://github.com/Training-Exercises-Dtsmart/1_nguyendinhthinh/assets/95834842/0db2ac3d-b724-4a31-b701-51ec65cc6e8b)
 
 ![image](https://github.com/Training-Exercises-Dtsmart/1_nguyendinhthinh/assets/95834842/588b9bab-85f1-48b3-9c7d-55eba5797f42)
+
+<h1 align="center">Day 6</h1>
+<h3>Component Weather</h3>
+
+![image](https://github.com/user-attachments/assets/d5f11648-c09f-43b6-a1a4-0d878d40c8c9)
+
+![image](https://github.com/user-attachments/assets/827e780a-e882-4332-95af-a2ca5c941c59)
+
+![image](https://github.com/user-attachments/assets/23aec91d-b3f4-4e54-abfe-8b2bd9d26353)
+
+<h1 align="center">Day 7</h1>
+<h3>Register, Login, RBAC</h3>
+
+<h4>Register:</h4> 
+
+![image](https://github.com/user-attachments/assets/f51344ff-1e90-41f7-a36e-80e3af6c6160)
+
+<h4>Login:</h4>
+
+![image](https://github.com/user-attachments/assets/0db84d09-b446-4db6-a873-59af36cd3c76)
+
+<h4>RBAC</h4>
+Config:
+
+![image](https://github.com/user-attachments/assets/e7df49b2-7017-4002-a39d-f90754404938)
+
+Migrate:
+
+![image](https://github.com/user-attachments/assets/38e8f122-1f49-4495-80e2-d4d3fb8e312e)
+
+Controller RBAC:
+
+![image](https://github.com/user-attachments/assets/a5c1f949-4f1a-410c-ab86-2fb02dc25c1a)
+
+![image](https://github.com/user-attachments/assets/9367a895-57e9-4406-85da-22cf34e192eb)
+
+![image](https://github.com/user-attachments/assets/9ccf85c5-edf0-441c-85be-133816f12fdc)
+
+Author Rule:
+
+![image](https://github.com/user-attachments/assets/f105001c-8c94-4027-bc2a-e2450cb02f15)
+
+<h1 align="center">Day 8</h1>
+<h3>Queue</h3>
+
+<4>Config</h4>
+
+![image](https://github.com/user-attachments/assets/31d9d6a8-1a93-40a4-88d9-bbe02e9f04d8)
+
+<h4>Migration</h4>
+
+![image](https://github.com/user-attachments/assets/5df0f5a4-99ea-489e-9a9d-afb2c552c7b4)
+
+<h4>Queue Send Mail</h4>
+
+![image](https://github.com/user-attachments/assets/55b538be-5b2d-44c5-b1ba-3f065291ed47)
+
+![image](https://github.com/user-attachments/assets/cfcd5ca8-0adf-4218-92ea-cc632e114fb5)
+
+![image](https://github.com/user-attachments/assets/538f664e-75e8-4677-8655-dd3baddd41df)
+
+![image](https://github.com/user-attachments/assets/19b834cf-57d2-4a42-9808-62cbaf4d613f)
+
+<h1 align="center">Day 9</h1>
+<h3>Caching</h3>
+
+![image](https://github.com/user-attachments/assets/e3898c5a-fe53-4403-9219-da31cab9b455)
+
+![image](https://github.com/user-attachments/assets/1d70f763-bb2f-4362-b4c3-0171b333bea8)
+
+<h3>Upload Files</h3>
+
+![image](https://github.com/user-attachments/assets/68fbcd2d-ddd3-457b-9be8-53525c109790)
+
+![image](https://github.com/user-attachments/assets/f54f0b6b-9f72-43af-b26a-5e78a7fe1409)
+
 
