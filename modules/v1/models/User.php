@@ -10,9 +10,7 @@ use yii\web\IdentityInterface;
 
 class User extends BaseUser implements IdentityInterface, RateLimitInterface
 {
-    public $rateLimit = 5; // Ví dụ: 100 requests per second
-    public $allowance;
-    public $allowance_updated_at;
+    public $rateLimit = 10;
 
     const SECRET_KEY = "dinhthinh";
 
@@ -98,9 +96,6 @@ class User extends BaseUser implements IdentityInterface, RateLimitInterface
     {
         $this->allowance = $allowance;
         $this->allowance_updated_at = $timestamp;
-        if ($this->save()) {
-            var_dump(111);
-        }
-//        $this->save(false);
+        $this->save(false);
     }
 }

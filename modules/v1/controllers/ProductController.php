@@ -5,6 +5,7 @@ namespace app\modules\v1\controllers;
 use Yii;
 use yii\db\Exception;
 use yii\filters\AccessControl;
+use yii\filters\RateLimiter;
 use yii\web\UploadedFile;
 use yii\filters\auth\HttpBearerAuth;
 use app\controllers\Controller;
@@ -22,7 +23,11 @@ class ProductController extends Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::class,
-            'except' => ['index', 'view'],
+            'except' => ['index',],
+        ];
+        $behaviors['rateLimiter'] = [
+            'class' => RateLimiter::class,
+            'enableRateLimitHeaders' => true,
         ];
         return $behaviors;
     }
@@ -32,7 +37,7 @@ class ProductController extends Controller
         $cache = Yii::$app->cache;
         $key = 'product-list';
         $products = $cache->get($key);
-        if ($products == false) {
+        if (!$products) {
             $searchModel = new ProductSearch();
             $products = $searchModel->search(Yii::$app->request->queryParams);
             $cache->set($key, $products, 10);
@@ -63,23 +68,22 @@ class ProductController extends Controller
         $user = Yii::$app->user->identity;
         $productForm = new ProductForm();
         $productForm->load(Yii::$app->request->post());
-
         if ($productForm->validate()) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 $productForm->created_by = $user->id;
-                $productForm->save();
+                if (!$productForm->save()) {
+                    throw new Exception('Cant save product');
+                }
                 $productImage = new ProductImage();
                 $productImage->product_id = $productForm->id;
                 $productImage->imageFiles = UploadedFile::getInstancesByName('images');
                 if (!$productImage->validate()) {
                     throw new Exception($productImage->getFirstError('imageFiles'));
                 }
-
                 if (!$productImage->uploadFile()) {
                     throw new Exception("Cant upload image file");
                 };
-
                 $transaction->commit();
                 return $this->json(true, ["product" => $productForm], "Create product successfully");
             } catch (\Exception $e) {
@@ -97,10 +101,10 @@ class ProductController extends Controller
             return $this->json(false, [], 'Product not found', HTTP_STATUS::NOT_FOUND);
         }
         $productForm->load(Yii::$app->request->post());
-        if (!$productForm->validate() || !$productForm->save()) {
-            return $this->json(false, ['errors' => $productForm->getErrors()], "Can't update product", HTTP_STATUS::BAD_REQUEST);
+        if ($productForm->validate() && $productForm->save()) {
+            return $this->json(true, ['product' => $productForm], 'Update product successfully');
         }
-        return $this->json(true, ['product' => $productForm], 'Update product successfully');
+        return $this->json(false, ['errors' => $productForm->getErrors()], "Can't update product", HTTP_STATUS::BAD_REQUEST);
     }
 
     public function actionDelete($id)
