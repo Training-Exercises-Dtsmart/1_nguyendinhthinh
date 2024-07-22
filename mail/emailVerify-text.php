@@ -1,10 +1,10 @@
 <?php
 /* @var $this yii\web\View */
-/* @var $user common\models\User */
+/* @var $username string */
 /* @var $verifyLink string */
 
 ?>
-    Hello <?= $user->username ?>,
+    Hello <?= $username ?>,
 
     Follow the link below to verify your email:
 

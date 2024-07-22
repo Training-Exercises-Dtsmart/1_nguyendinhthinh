@@ -30,10 +30,10 @@ class ProductImage extends BaseProductImage
                 $productImage->name = $fileName;
                 $productImage->product_id = $this->product_id;
                 if (!$productImage->save()) {
-                    return false; // Lỗi khi lưu vào cơ sở dữ liệu
+                    return false;
                 }
             } else {
-                return false; // Lỗi khi lưu tệp tin
+                return false;
             }
         }
         return true;

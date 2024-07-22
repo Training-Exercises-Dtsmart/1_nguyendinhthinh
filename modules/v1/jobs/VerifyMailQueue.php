@@ -4,14 +4,16 @@ namespace app\modules\v1\jobs;
 
 use Yii;
 
-class VerifyMailQueue extends \yii\base\BaseObject implements \yii\queue\JobInterface
+class VerifyMailQueue implements \yii\queue\JobInterface
 {
-    public $user;
+    public $username;
+    public $email;
     public $verify_link;
 
-    public function __construct($user, $verify_link)
+    public function __construct($username, $email, $verify_link)
     {
-        $this->user = $user;
+        $this->username = $username;
+        $this->email = $email;
         $this->verify_link = $verify_link;
     }
 
@@ -22,15 +24,15 @@ class VerifyMailQueue extends \yii\base\BaseObject implements \yii\queue\JobInte
                 ->mailer
                 ->compose(
                     ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
-                    ['user' => $this->user, 'verifyLink' => $this->verify_link]
+                    ['user' => $this->username, 'verifyLink' => $this->verify_link]
                 )
                 ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                ->setTo($this->user->email)
+                ->setTo($this->email)
                 ->setSubject('Email verification for ' . Yii::$app->name)
                 ->send();
-            Yii::info('Đã gửi email cho' . $this->user->email . ' thành công.', 'queue');
+            Yii::info('Đã gửi email cho' . $this->email . ' thành công.', 'queue');
         } catch (\Exception $e) {
-            Yii::error('Lỗi khi gửi email cho ' . $this->user->email . ': ' . $e->getMessage(), 'queue');
+            Yii::error('Lỗi khi gửi email cho ' . $this->email . ': ' . $e->getMessage(), 'queue');
         }
     }
 }
