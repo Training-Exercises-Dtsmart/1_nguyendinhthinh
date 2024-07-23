@@ -1,5 +1,6 @@
 <?php
 
+use yii\filters\Cors;
 use yii\filters\RateLimiter;
 
 $params = require __DIR__ . '/params.php';
@@ -118,7 +119,16 @@ $config = [
                     'class' => 'app\modules\v1\Module',
                 ],
             ],
+            'as corsFilter' => [
+                'class' => Cors::class,
+                'cors' => [
+                    'Origin' => ['*'],
+                    'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+                    'Access-Control-Request-Headers' => ['*'],
+                ],
+            ],
         ],
+
     ],
     // 'modules' => [
     //     'v1' => [

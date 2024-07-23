@@ -3,40 +3,58 @@
 namespace app\modules\v1\controllers;
 
 use app\controllers\Controller;
-use app\modules\HTTP_STATUS;
+use app\modules\HttpStatus;
 use app\modules\v1\jobs\VerifyMailQueue;
 use app\modules\v1\models\form\LoginForm;
+use app\modules\v1\models\form\PasswordResetRequestForm;
 use app\modules\v1\models\form\RegisterForm;
+use app\modules\v1\models\form\ResetPasswordForm;
 use app\modules\v1\models\User;
 use Yii;
+use yii\filters\AccessControl;
+use yii\filters\auth\HttpBearerAuth;
 
 class AuthController extends Controller
 {
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['authenticator'] = [
+            'class' => HttpBearerAuth::class,
+            'except' => ['index', 'view', 'register', 'login', 'verify-email', 'forgot-password', 'reset-password'],
+        ];
+        $behaviors['access'] = [
+            'class' => AccessControl::class,
+            'rules' => [
+                [
+                    'allow' => true,
+                    'actions' => ['view', 'search', 'create', 'update', 'delete'],
+                    'roles' => ['author']
+                ],
+                [
+                    'allow' => true,
+                    'actions' => ['login', 'register', 'verify-email', 'forgot-password', 'reset-password'],
+                    'roles' => ['?'],
+                ],
+                [
+                    'allow' => true,
+                    'actions' => ['logout'],
+                    'roles' => ['@'],
+                ],
+            ],
+        ];
+        return $behaviors;
+    }
+
     public function actionLogin()
     {
         $loginForm = new LoginForm();
         $loginForm->load(Yii::$app->request->post());
-
-        if (!$loginForm->validate() && !$loginForm->login()) {
-            return $this->json(false, [], 'Validation failed. Please check the input and try again.', HTTP_STATUS::BAD_REQUEST);
+        if ($loginForm->login()) {
+            return $this->json(true, ['token' => $loginForm->getAuthKey()], 'Successfully logged in');
         }
 
-        $user = User::findOne(['username' => $loginForm->username]);
-
-        if (empty($user)) {
-            return $this->json(false, [], 'Wrong username', HTTP_STATUS::BAD_REQUEST);
-        }
-
-        if (!$user->validatePassword($loginForm->password)) {
-            return $this->json(false, ['errors' => $user->getErrors()], 'Wrong username or password', HTTP_STATUS::UNAUTHORIZED);
-        }
-
-        $user->generateAuthKey();
-        if (!$user->save()) {
-            return $this->json(false, ['errors' => $user->getErrors()], 'Cant login.', HTTP_STATUS::BAD_REQUEST);
-        }
-
-        return $this->json(true, ['token' => $user->auth_key], 'Login Successfully', HTTP_STATUS::OK);
+        return $this->json(false, ['errors' => $loginForm->getErrors()], 'Cant login.', HttpStatus::BAD_REQUEST);
     }
 
     /**
@@ -47,32 +65,20 @@ class AuthController extends Controller
         $registerForm = new RegisterForm();
         $registerForm->load(Yii::$app->request->post());
 
-        if (!$registerForm->validate() || !$registerForm->save()) {
-            return $this->json(false, ['errors' => $registerForm->getErrors()], 'Cant register user.', HTTP_STATUS::BAD_REQUEST);
+        if ($registerForm->register()) {
+            return $this->json(true, ['user' => $registerForm], 'Register successfully', HttpStatus::OK);
         }
 
-        $registerForm->password = Yii::$app->getSecurity()->generatePasswordHash($registerForm->password);
-        $registerForm->generateVerificationToken();
-        $registerForm->email_verified = RegisterForm::EMAIL_VERIFY_PENDING;
+        return $this->json(false, ['error' => $registerForm->getErrors()], "Can't register", HttpStatus::BAD_REQUEST);
 
-        if (!$registerForm->save()) {
-            return $this->json(false, ['errors' => $registerForm->getErrors()], 'Cant register.', HTTP_STATUS::BAD_REQUEST);
-        }
-
-        $this->sendVerificationEmail($registerForm);
-
-        $auth = Yii::$app->authManager;
-        $author = $auth->getRole('author');
-        $auth->assign($author, $registerForm->id);
-
-        return $this->json(true, ['user' => $registerForm], 'Register Successfully', HTTP_STATUS::OK);
     }
 
-    public function sendVerificationEmail($registerForm)
+    public function actionLogout()
     {
-        $verifyLink = Yii::$app->urlManager->createAbsoluteUrl(['/api/v1/auth/verify-email', 'token' => $registerForm->verification_token]);
-
-        Yii::$app->queue->push(new VerifyMailQueue($registerForm, $verifyLink));
+        if (Yii::$app->user->logout()) {
+            return $this->json(true, [], 'Logged out successfully', HttpStatus::OK);
+        }
+        return $this->json(false, [], 'Failed to logout', HttpStatus::BAD_REQUEST);
     }
 
     public function actionVerifyEmail($token)
@@ -88,5 +94,38 @@ class AuthController extends Controller
         } catch (\RuntimeException $e) {
             return $this->json(false, [], $e->getMessage());
         }
+    }
+
+    public function actionForgotPassword($email)
+    {
+        $model = PasswordResetRequestForm::findByEmail($email);
+        if (!$model) {
+            return $this->json(false, [], 'User not found', HttpStatus::NOT_FOUND);
+        }
+
+        if ($model->sendMailResetPassword()) {
+            return $this->json(true, [], 'Check your email for reset password');
+        }
+        return $this->json(false, [], 'Failed to send reset password email.', HttpStatus::BAD_REQUEST);
+    }
+
+    public function actionResetPassword($token)
+    {
+        $model = ResetPasswordForm::findByResetPasswordToken($token);
+        if (!$model) {
+            return $this->json(false, [], 'Reset password token is invalid or expired. Please request again.');
+        }
+        $model->load(Yii::$app->request->post());
+        if (!$model->validate()) {
+            return $this->json(false, ['errors' => $model->getErrors()], 'Failed to validate reset password', HttpStatus::BAD_REQUEST);
+        }
+
+        $model->password = Yii::$app->getSecurity()->generatePasswordHash($model->password);
+        $model->reset_password_token = null;
+        if ($model->save()) {
+            return $this->json(true, [], 'Password reset successfully');
+        }
+
+        return $this->json(false, ['error' => $model->getErrors()], 'Failed to reset password', HttpStatus::BAD_REQUEST);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 namespace app\modules;
-class HTTP_STATUS
+class HttpStatus
 {
     const OK = 200;
     const CREATED = 201;

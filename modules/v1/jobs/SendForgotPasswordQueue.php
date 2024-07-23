@@ -3,32 +3,30 @@
 namespace app\modules\v1\jobs;
 
 use Yii;
+use yii\queue\JobInterface;
 
-class VerifyMailQueue implements \yii\queue\JobInterface
+class SendForgotPasswordQueue implements JobInterface
 {
     public $username;
     public $email;
-    public $verify_link;
+    public $verificationLink;
 
-    public function __construct($username, $email, $verify_link)
+    public function __construct($username, $email, $verificationLink)
     {
         $this->username = $username;
         $this->email = $email;
-        $this->verify_link = $verify_link;
+        $this->verificationLink = $verificationLink;
     }
 
     public function execute($queue)
     {
         try {
-            Yii::$app
-                ->mailer
-                ->compose(
-                    ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
-                    ['username' => $this->username, 'verifyLink' => $this->verify_link]
-                )
+            Yii::$app->mailer->compose(
+                ['html' => 'resetPasswordToken'],
+                ['username' => $this->username, 'resetLink' => $this->verificationLink])
                 ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                 ->setTo($this->email)
-                ->setSubject('Email verification for ' . Yii::$app->name)
+                ->setSubject('Email restart password')
                 ->send();
             Yii::info('Đã gửi email cho' . $this->email . ' thành công.', 'queue');
         } catch (\Exception $e) {

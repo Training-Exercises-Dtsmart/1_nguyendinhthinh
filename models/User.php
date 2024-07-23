@@ -15,6 +15,9 @@ class User extends BaseUser
 {
     const STATUS_ACTIVE = 1;
     const STATUS_INACTIVE = 0;
+    const STATUS_DELETE = 5;
+    const ROLE_ADMIN = 1;
+    const ROLE_USER = 2;
 
     public function formName()
     {

@@ -25,6 +25,7 @@ use \app\models\query\UserQuery;
  * @property integer $allowance_updated_at
  * @property integer $email_verified
  * @property string $verification_token
+ * @property string $reset_password_token
  * @property string $created_at
  * @property string $updated_at
  *
@@ -70,7 +71,7 @@ abstract class User extends \yii\db\ActiveRecord
             [['username', 'password'], 'required'],
             [['status', 'allowance', 'allowance_updated_at', 'email_verified'], 'integer'],
             [['deleted_at'], 'safe'],
-            [['username', 'password', 'email', 'fullname', 'telephone', 'auth_key', 'verification_token'], 'string', 'max' => 255],
+            [['username', 'password', 'email', 'fullname', 'telephone', 'auth_key', 'verification_token', 'reset_password_token'], 'string', 'max' => 255],
             [['username'], 'unique']
         ]);
     }
@@ -96,6 +97,7 @@ abstract class User extends \yii\db\ActiveRecord
             'allowance_updated_at' => 'Allowance Updated At',
             'email_verified' => 'Email Verified',
             'verification_token' => 'Verification Token',
+            'reset_password_token' => 'Reset Password Token',
         ]);
     }
 

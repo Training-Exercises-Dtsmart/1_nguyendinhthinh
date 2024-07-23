@@ -52,6 +52,11 @@ class User extends BaseUser implements IdentityInterface, RateLimitInterface
         return static::findOne(['username' => $username]);
     }
 
+    public static function findByEmail($email)
+    {
+        return static::find()->where(['email' => $email])->one();
+    }
+
     public function generateVerificationToken()
     {
         $this->verification_token = Yii::$app->security->generateRandomString() . '_' . time();
@@ -80,6 +85,13 @@ class User extends BaseUser implements IdentityInterface, RateLimitInterface
     {
         $this->email_verified = 1;
         $this->verification_token = null;
+    }
+
+    public static function findByResetPasswordToken($token)
+    {
+        return static::findOne([
+            'reset_password_token' => $token,
+        ]);
     }
 
     public function getRateLimit($request, $action)
