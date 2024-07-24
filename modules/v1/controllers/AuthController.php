@@ -4,7 +4,6 @@ namespace app\modules\v1\controllers;
 
 use app\controllers\Controller;
 use app\modules\HttpStatus;
-use app\modules\v1\jobs\VerifyMailQueue;
 use app\modules\v1\models\form\LoginForm;
 use app\modules\v1\models\form\PasswordResetRequestForm;
 use app\modules\v1\models\form\RegisterForm;

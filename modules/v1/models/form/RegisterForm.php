@@ -3,7 +3,7 @@
 namespace app\modules\v1\models\form;
 
 use app\modules\HttpStatus;
-use app\modules\v1\jobs\VerifyMailQueue;
+use app\modules\v1\jobs\VerifyMailJob;
 use app\modules\v1\models\User;
 use Yii;
 
@@ -44,10 +44,10 @@ class RegisterForm extends User
     public function sendVerificationEmail()
     {
 //        $verifyLink = Yii::$app->urlManager->createAbsoluteUrl(['/api/v1/auth/verify-email', 'token' => $registerForm->verification_token]);
-//        Yii::$app->queue->push(new VerifyMailQueue($registerForm->username, $registerForm->email, $verifyLink));
+//        Yii::$app->queue->push(new VerifyMailJob($registerForm->username, $registerForm->email, $verifyLink));
         try {
             $verifyLink = Yii::$app->urlManager->createAbsoluteUrl(['/api/v1/auth/verify-email', 'token' => $this->verification_token]);
-            Yii::$app->queue->push(new VerifyMailQueue($this->username, $this->email, $verifyLink));
+            Yii::$app->queue->push(new VerifyMailJob($this->username, $this->email, $verifyLink));
 
         } catch (\Exception $e) {
             Yii::error('Error sending verification email: ' . $e->getMessage(), __METHOD__);
