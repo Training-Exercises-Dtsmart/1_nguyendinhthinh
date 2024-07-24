@@ -10,7 +10,7 @@ use yii\httpclient\Exception;
 class WeatherComponent extends Component
 {
     public $apiKey;
-    public $apiUrl = 'http://api.weatherapi.com/v1/current.json';
+    public $apiUrl;
 
     /**
      * @throws Exception

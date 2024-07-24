@@ -118,7 +118,7 @@ $config = [
         'weather' => [
             'class' => 'app\components\WeatherComponent',
             'apiKey' => env('WEATHER_API_KEY'),
-
+            'url' => env('WEATHER_URL')
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
