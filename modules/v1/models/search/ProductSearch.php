@@ -4,6 +4,7 @@ namespace app\modules\v1\models\search;
 
 use app\modules\v1\models\Product;
 use yii\data\ActiveDataProvider;
+use yii\rest\Serializer;
 
 class ProductSearch extends Product
 {
@@ -45,7 +46,11 @@ class ProductSearch extends Product
         $query->andFilterWhere(["or", ["LIKE", "product.name", $this->keyword],
             ["LIKE", "category_product.name", $this->category_product_name],
             ["LIKE", "category_product.name", $this->keyword],]);
-        return $dataProvider;
+
+        $serializer = new Serializer(['collectionEnvelope' => 'items']);
+        $data = $serializer->serialize($dataProvider);
+
+        return $data;
 
     }
 }

@@ -13,7 +13,7 @@ class ProductForm extends Product
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            [['name', 'price', 'stock'], 'required'],
+            [['name', 'price', 'stock', 'category_product_id'], 'required'],
             ['name', 'unique'],
             ['name', 'string', 'max' => 255],
         ]);

@@ -29,9 +29,5 @@ class Product extends BaseProduct
     {
         return isset($this->categoryProduct) ? $this->categoryProduct->name : null;
     }
-
-    public function getProductImages()
-    {
-        return parent::getProductImages();
-    }
+    
 }
