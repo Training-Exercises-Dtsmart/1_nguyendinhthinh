@@ -22,9 +22,28 @@ $config = [
                 'application/json' => 'yii\web\JsonParser',
             ]
         ],
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
+        'session' => [
+            'class' => 'yii\web\Session',
+            'name' => 'cart',
+            'timeout' => 3600,
         ],
+        'redis' => [
+            'class' => 'yii\redis\Connection',
+            'hostname' => 'localhost',
+            'port' => 6379,
+            'database' => 0,
+        ],
+        'cache' => [
+            'class' => 'yii\redis\Cache',
+            'redis' => [
+                'hostname' => 'localhost',
+                'port' => 6379,
+                'database' => 1,
+            ],
+        ],
+//        'cache' => [
+//            'class' => 'yii\caching\FileCache',
+//        ],
 //        'cache' => [
 //            'class' => 'yii\caching\MemCache',
 //            'servers' => [
@@ -98,7 +117,8 @@ $config = [
         ],
         'weather' => [
             'class' => 'app\components\WeatherComponent',
-            'apiKey' => '164c1b59d84e4c4ebe840550241007'
+            'apiKey' => env('WEATHER_API_KEY'),
+
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
