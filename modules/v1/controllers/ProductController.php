@@ -35,22 +35,18 @@ class ProductController extends Controller
             'class' => BlameableBehavior::class,
             'createdByAttribute' => 'created_by',
         ];
-
         return $behaviors;
     }
 
     public function actionIndex()
     {
-        $cache = Yii::$app->cache;
-        $key = 'product-list';
-        $products = $cache->get($key);
+        $key = "product-list";
+        $products = Yii::$app->cache->get($key);
         if (!$products) {
             $searchModel = new ProductSearch();
             $products = $searchModel->search(Yii::$app->request->queryParams);
-            $cache->set($key, $products, 600);
+            Yii::$app->cache->set($key, $products, 600);
         }
-
-
         return $this->json(true, $products);
     }
 
@@ -80,16 +76,16 @@ class ProductController extends Controller
             $transaction = Yii::$app->db->beginTransaction();
             try {
                 if (!$productForm->save()) {
-                    throw new Exception('Cant save product');
+                    return $this->json(false, ['error' => $productForm->getErrors()], 'Cant save product', HttpStatus::BAD_REQUEST);
                 }
                 $productImage = new ProductImage();
                 $productImage->product_id = $productForm->id;
                 $productImage->imageFiles = UploadedFile::getInstancesByName('images');
                 if (!$productImage->validate()) {
-                    throw new Exception($productImage->getFirstError('imageFiles'));
+                    return $this->json(false, ['error' => $productImage->getErrors()], 'Validate failed', HttpStatus::BAD_REQUEST);
                 }
                 if (!$productImage->uploadFile()) {
-                    throw new Exception("Cant upload image file");
+                    return $this->json(false, ['error' => $productImage->getErrors()], "Can't save image product", HttpStatus::BAD_REQUEST);
                 }
                 $transaction->commit();
                 return $this->json(true, ["product" => $productForm], "Create product successfully");

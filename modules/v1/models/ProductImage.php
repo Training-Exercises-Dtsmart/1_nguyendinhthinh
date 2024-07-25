@@ -18,7 +18,7 @@ class ProductImage extends BaseProductImage
 
     public function uploadFile()
     {
-        $uploadPath = Yii::getAlias('@app/web/uploads/product/');
+        $uploadPath = Yii::getAlias('@app/web/assets/product/');
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0777, true);
         }
