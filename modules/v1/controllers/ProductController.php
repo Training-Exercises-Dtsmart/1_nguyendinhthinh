@@ -25,28 +25,24 @@ class ProductController extends Controller
         $behaviors = parent::behaviors();
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::class,
-            'except' => ['index', 'view'],
+            'except' => ['index'],
         ];
         $behaviors['rateLimiter'] = [
             'class' => RateLimiter::class,
             'enableRateLimitHeaders' => true,
-        ];
-        $behaviors['blamable'] = [
-            'class' => BlameableBehavior::class,
-            'createdByAttribute' => 'created_by',
         ];
         return $behaviors;
     }
 
     public function actionIndex()
     {
-        $key = "product-list";
-        $products = Yii::$app->cache->get($key);
-        if (!$products) {
-            $searchModel = new ProductSearch();
-            $products = $searchModel->search(Yii::$app->request->queryParams);
-            Yii::$app->cache->set($key, $products, 600);
-        }
+//        $key = "product-list";
+//        $products = Yii::$app->cache->get($key);
+//        if (!$products) {
+//            Yii::$app->cache->set($key, $products, 600);
+//        }
+        $searchModel = new ProductSearch();
+        $products = $searchModel->search(Yii::$app->request->queryParams);
         return $this->json(true, $products);
     }
 

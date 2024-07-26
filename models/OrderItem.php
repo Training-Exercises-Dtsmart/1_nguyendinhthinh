@@ -13,4 +13,16 @@ class OrderItem extends BaseOrderItem
     {
         return "";
     }
+
+    public function fields()
+    {
+        return array_merge(parent::fields(), [
+            'product_name' => 'productName'
+        ]);
+    }
+
+    public function getProductName(): string
+    {
+        return isset($this->product) ? $this->product->name : '';
+    }
 }
