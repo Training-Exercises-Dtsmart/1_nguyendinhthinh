@@ -195,4 +195,13 @@ Author Rule:
 
 ![image](https://github.com/user-attachments/assets/f54f0b6b-9f72-43af-b26a-5e78a7fe1409)
 
+<h1 align="center">Day ...</h1>
+<h3>Limit rate</h3>
+<h4>Config nginx:</h4>
+
+![image](https://github.com/user-attachments/assets/7a8f197c-092e-4e52-a30b-af489b2dfcee)
+
+<h4>Test post man:</h4>
+
+![image](https://github.com/user-attachments/assets/b05e073d-0585-443d-a778-aa914f7f2148)
 
