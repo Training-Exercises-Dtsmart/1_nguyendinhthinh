@@ -4,6 +4,7 @@ namespace app\modules\v1\models\form;
 
 use app\modules\HttpStatus;
 use app\modules\v1\models\User;
+use Yii;
 
 class LoginForm extends User
 {
@@ -29,6 +30,7 @@ class LoginForm extends User
             $user->generateAuthKey();
             if ($user->save()) {
                 $this->auth_key = $user->getAuthKey();
+                Yii::$app->user->login($user, 3600 * 24 * 30);
                 return true;
             }
             $this->addError('user', $user->getErrors());

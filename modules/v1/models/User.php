@@ -89,9 +89,7 @@ class User extends BaseUser implements IdentityInterface, RateLimitInterface
 
     public static function findByResetPasswordToken($token)
     {
-        return static::findOne([
-            'reset_password_token' => $token,
-        ]);
+        return static::find()->select('id')->where(['reset_password_token' => $token])->one();
     }
 
     public function getRateLimit($request, $action)

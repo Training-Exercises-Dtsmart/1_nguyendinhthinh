@@ -85,7 +85,7 @@ class AuthController extends Controller
         try {
             $user = User::findByVerificationToken($token);
             if (!$user) {
-                return $this->json(false, [], 'Verification token is invalid or expired. Please request again.');
+                return $this->json(false, [], 'Verification token is invalid or expired. Please request again.', HttpStatus::BAD_REQUEST);
             }
             $user->verifyEmail();
             $user->save(false);
@@ -112,13 +112,12 @@ class AuthController extends Controller
     {
         $model = ResetPasswordForm::findByResetPasswordToken($token);
         if (!$model) {
-            return $this->json(false, [], 'Reset password token is invalid or expired. Please request again.');
+            return $this->json(false, [], 'Reset password token is invalid or expired. Please request again.', HttpStatus::BAD_REQUEST);
         }
         $model->load(Yii::$app->request->post());
         if (!$model->validate()) {
             return $this->json(false, ['errors' => $model->getErrors()], 'Failed to validate reset password', HttpStatus::BAD_REQUEST);
         }
-
         $model->password = Yii::$app->getSecurity()->generatePasswordHash($model->password);
         $model->reset_password_token = null;
         if ($model->save()) {

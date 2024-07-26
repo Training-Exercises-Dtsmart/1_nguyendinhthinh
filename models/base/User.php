@@ -18,6 +18,7 @@ use \app\models\query\UserQuery;
  * @property string $email
  * @property string $fullname
  * @property string $telephone
+ * @property string $image
  * @property string $auth_key
  * @property integer $status
  * @property string $deleted_at
@@ -71,7 +72,7 @@ abstract class User extends \yii\db\ActiveRecord
             [['username', 'password'], 'required'],
             [['status', 'allowance', 'allowance_updated_at', 'email_verified'], 'integer'],
             [['deleted_at'], 'safe'],
-            [['username', 'password', 'email', 'fullname', 'telephone', 'auth_key', 'verification_token', 'reset_password_token'], 'string', 'max' => 255],
+            [['username', 'password', 'email', 'fullname', 'telephone', 'image', 'auth_key', 'verification_token', 'reset_password_token'], 'string', 'max' => 255],
             [['username'], 'unique']
         ]);
     }
@@ -88,6 +89,7 @@ abstract class User extends \yii\db\ActiveRecord
             'email' => 'Email',
             'fullname' => 'Fullname',
             'telephone' => 'Telephone',
+            'image' => 'Image',
             'auth_key' => 'Auth Key',
             'status' => 'Status',
             'created_at' => 'Created At',

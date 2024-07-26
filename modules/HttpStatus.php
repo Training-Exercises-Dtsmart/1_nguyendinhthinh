@@ -13,4 +13,5 @@ class HttpStatus
     const NOT_FOUND = 404;
     const METHOD_NOT_ALLOWED = 405;
     const CONFLICT = 409;
+    const INTERNAL_SERVER_ERROR = 500;
 }
