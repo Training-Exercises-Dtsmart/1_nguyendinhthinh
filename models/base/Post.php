@@ -15,6 +15,7 @@ use \app\models\query\PostQuery;
  * @property integer $id
  * @property string $title
  * @property string $body
+ * @property integer $views
  * @property string $publish_date
  * @property integer $user_id
  * @property integer $category_post_id
@@ -59,8 +60,8 @@ abstract class Post extends \yii\db\ActiveRecord
         return ArrayHelper::merge($parentRules, [
             [['title'], 'required'],
             [['body'], 'string'],
+            [['views', 'user_id', 'category_post_id', 'status'], 'integer'],
             [['publish_date'], 'safe'],
-            [['user_id', 'category_post_id', 'status'], 'integer'],
             [['title'], 'string', 'max' => 255],
             [['title'], 'unique'],
             [['category_post_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\CategoryPost::class, 'targetAttribute' => ['category_post_id' => 'id']],
@@ -77,6 +78,7 @@ abstract class Post extends \yii\db\ActiveRecord
             'id' => 'ID',
             'title' => 'Title',
             'body' => 'Body',
+            'views' => 'Views',
             'publish_date' => 'Publish Date',
             'user_id' => 'User ID',
             'category_post_id' => 'Category Post ID',

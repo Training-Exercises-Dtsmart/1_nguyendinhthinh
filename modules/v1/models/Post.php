@@ -9,6 +9,8 @@ class Post extends BasePost
     const ACTIVE = 1;
     const DISABLED = 0;
     const DELETE = -1;
+    const VIEW_INIT = 0;
+    const VIEW_INCREMENT = 1;
 
     public function fields()
     {

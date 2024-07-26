@@ -6,5 +6,4 @@ use app\models\CategoryPost;
 
 class CategoryPostForm extends CategoryPost
 {
-
 }
