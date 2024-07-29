@@ -107,6 +107,7 @@ $config = [
                 [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
+                    'logFile' => '@runtime/logs/app.log',
                 ],
             ],
         ],
@@ -120,6 +121,14 @@ $config = [
             'apiKey' => env('WEATHER_API_KEY'),
             'apiUrl' => env('WEATHER_URL')
         ],
+        'zaloPay' => [
+            'class' => 'app\components\ZaloPayComponent',
+            'key1' => env('ZALO_PAY_KEY_1'),
+            'key2' => env('ZALO_PAY_KEY_2'),
+            'appId' => env('ZALO_PAY_APP_ID'),
+            'endpoint' => env('ZALO_PAY_END_POINT'),
+        ],
+
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
         ],
