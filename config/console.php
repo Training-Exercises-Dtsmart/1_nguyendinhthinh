@@ -49,7 +49,20 @@ $config = [
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
+                    'levels' => ['error', 'warning', 'info'],
+                    'logFile' => '@runtime/logs/app.log',
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
+                    'categories' => ['yii\db\*'], // Logs related to database
+                    'logFile' => '@runtime/logs/db.log',
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['error', 'warning', 'info'],
+                    'categories' => ['customCategory'], // Your custom category
+                    'logFile' => '@runtime/logs/custom.log',
                 ],
             ],
         ],
