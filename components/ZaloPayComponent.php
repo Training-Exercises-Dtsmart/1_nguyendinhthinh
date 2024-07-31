@@ -2,6 +2,7 @@
 
 namespace app\components;
 
+use app\models\Order;
 use Yii;
 use yii\base\Component;
 use yii\httpclient\Client;
@@ -13,19 +14,69 @@ class ZaloPayComponent extends Component
     public $key2;
     public $endpoint;
 
+    public function callBack($params)
+    {
+        $result = [];
+        if (empty($params)) {
+            $result["return_code"] = -1;
+            $result["return_message"] = "No data received";
+            return $result;
+        }
+
+        if (!isset($params["data"]) || !isset($params["mac"])) {
+            $result["return_code"] = -1;
+            $result["return_message"] = "Missing data or mac";
+            return $result;
+        }
+
+        $data = $params["data"];
+
+        $mac = hash_hmac("sha256", $data, $this->key2);
+        $requestmac = $params["mac"];
+
+        Yii::info('Mac:' . $mac);
+        Yii::info('Request mac:' . $requestmac);
+
+        if (strcmp($mac, $requestmac) != 0) {
+            $result["return_code"] = -1;
+            $result["return_message"] = "MAC not equal";
+            return $result;
+        }
+
+        $datajson = json_decode($data, true);
+        $app_trans_id = $datajson["app_trans_id"];
+        $order = Order::find()->where(['app_trans_id' => $app_trans_id])->one();
+        if (!$order) {
+            $result["return_code"] = -1;
+            $result["return_message"] = "Order not found";
+            return $result;
+        }
+
+        $order->payment_status = Order::PAYMENT_STATUS_PAID;
+        $order->zp_trans_id = $datajson["zp_trans_id"];
+        $order->save(false);
+        $result["return_code"] = 1;
+        $result["return_message"] = "Success";
+        return $result;
+    }
+
     public function createOrder($params)
     {
+        $app_trans_id = date("ymd") . "_" . $params['orderId'];
+        $app_time = round(microtime(true) * 1000);
+
         $client = new Client();
         $order = [
             'app_id' => (integer)$this->appId,
-            "app_time" => round(microtime(true) * 1000),
-            "app_trans_id" => date("ymd") . "_" . $params['orderId'],
+            "app_time" => $app_time,
+            "app_trans_id" => $app_trans_id,
             "app_user" => Yii::$app->user->identity->username,
             "item" => '[]',
             "embed_data" => '{}',
+            "callback_url" => env("URL_ORDER_CALL_BACK"),
             "amount" => $params['amount'],
             "description" => $params['description'],
-            "bank_code" => "zalopayapp"
+            "bank_code" => ""
         ];
 
         $data = $order["app_id"] . "|" . $order["app_trans_id"] . "|" . $order["app_user"] . "|" . $order["amount"] . "|" . $order["app_time"] . "|" . $order["embed_data"] . "|" . $order["item"];
@@ -33,10 +84,12 @@ class ZaloPayComponent extends Component
         $order["mac"] = hash_hmac("sha256", $data, $this->key1);
         $response = $client->post("{$this->endpoint}/create", $order)->send();
         if ($response->isOk) {
+            $order = Order::find()->where(['id' => $params['orderId']])->one();
+            $order->app_trans_id = $app_trans_id;
+            $order->save(false);
             return $response->data;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public function queryOrder($app_trans_id)
