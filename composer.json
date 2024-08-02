@@ -27,21 +27,30 @@
     "yiisoft/yii2-queue": "^2.3",
     "vlucas/phpdotenv": "^5.6",
     "yiithings/yii2-dotenv": "*",
-    "yiisoft/yii2-redis": "^2.0"
+    "yiisoft/yii2-redis": "^2.0",
+    "ext-json": "*",
+    "google/apiclient": "2.15.0",
+    "roopz/yii2-imap": "dev-master",
+    "ext-imap": "*",
+    "cboden/ratchet": "^0.4.4"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",
     "yiisoft/yii2-gii": "~2.2.0",
     "yiisoft/yii2-faker": "~2.0.0",
-    "codeception/codeception": "^5.0.0 || ^4.0",
+    "codeception/codeception": "^5.1",
     "codeception/lib-innerbrowser": "^4.0 || ^3.0 || ^1.1",
     "codeception/module-asserts": "^3.0 || ^1.1",
     "codeception/module-yii2": "^1.1",
     "codeception/module-filesystem": "^3.0 || ^2.0 || ^1.1",
-    "codeception/verify": "^3.0 || ^2.2",
+    "codeception/verify": "^3.2",
     "symfony/browser-kit": "^6.0 || >=2.7 <=4.2.4",
     "schmunk42/yii2-giiant": "^1.0",
-    "yiisoft/yii2-swiftmailer": "~2.1.0"
+    "yiisoft/yii2-swiftmailer": "~2.1.0",
+    "codeception/specify": "^0.4.6",
+    "codeception/module-rest": "^3.4",
+    "codeception/module-phpbrowser": "^3.0",
+    "justinrainbow/json-schema": "^5.3"
   },
   "config": {
     "allow-plugins": {
@@ -53,6 +62,7 @@
     }
   },
   "scripts": {
+    "test-api": "php vendor/bin/codecept run api --steps",
     "post-install-cmd": [
       "yii\\composer\\Installer::postInstall"
     ],
@@ -82,5 +92,10 @@
       "type": "composer",
       "url": "https://asset-packagist.org"
     }
-  ]
+  ],
+  "autoload": {
+    "psr-4": {
+      "Helper\\": "tests/_support/Helper/"
+    }
+  }
 }
