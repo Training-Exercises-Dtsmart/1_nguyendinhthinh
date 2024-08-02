@@ -20,8 +20,9 @@ use \app\models\query\OrderQuery;
  * @property string $deleted_at
  * @property integer $payment_method
  * @property integer $payment_status
- * @property integer $app_trans_id
- * @property integer $zp_trans_id
+ * @property string $app_trans_id
+ * @property string $zp_trans_id
+ * @property string $m_refund_id
  * @property string $created_at
  * @property string $updated_at
  *
@@ -60,9 +61,10 @@ abstract class Order extends \yii\db\ActiveRecord
     {
         $parentRules = parent::rules();
         return ArrayHelper::merge($parentRules, [
-            [['user_id', 'status', 'payment_method', 'payment_status', 'app_trans_id', 'zp_trans_id'], 'integer'],
+            [['user_id', 'status', 'payment_method', 'payment_status'], 'integer'],
             [['total'], 'number'],
             [['order_date', 'deleted_at'], 'safe'],
+            [['app_trans_id', 'zp_trans_id', 'm_refund_id'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\User::class, 'targetAttribute' => ['user_id' => 'id']]
         ]);
     }
@@ -85,6 +87,7 @@ abstract class Order extends \yii\db\ActiveRecord
             'payment_status' => 'Payment Status',
             'app_trans_id' => 'App Trans ID',
             'zp_trans_id' => 'Zp Trans ID',
+            'm_refund_id' => 'M Refund ID',
         ]);
     }
 

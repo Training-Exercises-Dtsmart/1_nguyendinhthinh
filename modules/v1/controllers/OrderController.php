@@ -9,9 +9,13 @@ use app\models\OrderItem;
 use app\modules\HttpStatus;
 use app\modules\v1\models\Product;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\filters\auth\HttpBasicAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\helpers\Console;
+use yii\helpers\Json;
+use yii\httpclient\Client;
+use yii\httpclient\Exception;
 
 class OrderController extends Controller
 {
@@ -27,6 +31,47 @@ class OrderController extends Controller
 
     public function actionIndex()
     {
+    }
+
+    /**
+     * @throws Exception
+     * @throws InvalidConfigException
+     */
+    public function actionGenerateQr()
+    {
+//        $json = file_get_contents('php://input');
+//        $data = json::decode($json, true);
+//        if (empty($data['accountNo']) || empty($data['accountName']) || empty($data['acqId']) || empty($data['amount'])) {
+//            return $this->asJson([
+//                'code' => '01',
+//                'desc' => 'Thiếu dữ liệu đầu vào'
+//            ]);
+//        }
+
+        $data = Yii::$app->request->post();
+
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('POST')
+            ->setUrl('https://api.vietqr.io/v2/generate')
+            ->setHeaders([
+                'x-client-id' => '55e2537a-e411-488d-93b1-959223743505',
+                'x-api-key' => '7a658b20-fdd4-432b-a4c5-44bf720a5193',
+                'Content-Type' => 'application/json',
+            ])
+            ->setContent(Json::encode([
+                'accountNo' => $data['accountNo'],
+                'accountName' => $data['accountName'],
+                'acqId' => $data['acqId'],
+                'amount' => $data['amount'], // Số tiền cần điều chỉnh theo nhu cầu
+                'addInfo' => $data['addInfo'],
+                'template' => 'compact'
+            ]))
+            ->send();
+        if ($response->isOk) {
+            return $response->data;
+        }
+        return null; // Hoặc xử lý lỗi theo yêu cầu
     }
 
     public function actionCallback()
@@ -104,21 +149,38 @@ class OrderController extends Controller
         }
     }
 
-    public function actionQuery($app_trans_id)
+    public function actionQuery($id)
     {
-        $order = Yii::$app->zaloPay->queryOrder($app_trans_id);
-        return $order;
+        $order = Order::find()->where(["id" => $id])->one();
+        if (!$order) {
+            return $this->json(false, [], "Order not found", HttpStatus::NOT_FOUND);
+        }
+
+        $queryOrder = Yii::$app->zaloPay->queryOrder($order->app_trans_id);
+        if ($queryOrder['return_code'] != 1) {
+            return $this->json(false, ['order' => $queryOrder], "Failed to query order", HttpStatus::BAD_REQUEST);
+        }
+        return $this->json(true, ['order' => $queryOrder], 'Order query successfully', HttpStatus::OK);
     }
 
-    public function actionRefund($zp_trans_id, $amount)
+    public function actionRefund($id)
     {
-        $refundOrder = Yii::$app->zaloPay->refundOrder($zp_trans_id, $amount);
-        return $refundOrder;
+        $order = Order::find()->where(["id" => $id])->one();
+        if (!$order) {
+            return $this->json(false, [], "Order not found", HttpStatus::NOT_FOUND);
+        }
+
+        $refundOrder = Yii::$app->zaloPay->refundOrder($order->zp_trans_id, $order->total);
+        return $this->json(true, ['order' => $refundOrder], 'Refund order successfully', HttpStatus::OK);
     }
 
-    public function actionQueryRefund($m_refund_id)
+    public function actionQueryRefund($id)
     {
-        $refundOrder = Yii::$app->zaloPay->queryRefund($m_refund_id);
-        return $refundOrder;
+        $order = Order::find()->where(["id" => $id])->one();
+        if (!$order) {
+            return $this->json(false, [], "Order not found", HttpStatus::NOT_FOUND);
+        }
+        $refundOrder = Yii::$app->zaloPay->queryRefund($order->m_refund_id);
+        return $this->json(true, ['order' => $refundOrder], 'Refund order successfully', HttpStatus::OK);
     }
 }

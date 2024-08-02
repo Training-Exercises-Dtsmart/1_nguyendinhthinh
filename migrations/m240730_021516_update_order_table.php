@@ -16,6 +16,7 @@ class m240730_021516_update_order_table extends Migration
         $this->addColumn('order', 'payment_status', $this->integer());
         $this->addColumn('order', 'app_trans_id', $this->string());
         $this->addColumn('order', 'zp_trans_id', $this->string());
+        $this->addColumn('order', 'm_refund_id', $this->string());
     }
 
     /**
@@ -27,6 +28,7 @@ class m240730_021516_update_order_table extends Migration
         $this->dropColumn('order', 'payment_status');
         $this->dropColumn('order', 'app_trans_id');
         $this->dropColumn('order', 'zp_trans_id');
+        $this->dropColumn('order', 'm_refund_id');
     }
 
     /*

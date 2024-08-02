@@ -62,21 +62,19 @@ class ZaloPayComponent extends Component
 
     public function createOrder($params)
     {
-        $app_trans_id = date("ymd") . "_" . $params['orderId'];
-        $app_time = round(microtime(true) * 1000);
-
+        $appTransId = date("ymd") . "_" . $params['orderId'];
         $client = new Client();
         $order = [
             'app_id' => (integer)$this->appId,
-            "app_time" => $app_time,
-            "app_trans_id" => $app_trans_id,
+            "app_time" => round(microtime(true) * 1000),
+            "app_trans_id" => $appTransId,
             "app_user" => Yii::$app->user->identity->username,
             "item" => '[]',
             "embed_data" => '{}',
             "callback_url" => env("URL_ORDER_CALL_BACK"),
             "amount" => $params['amount'],
             "description" => $params['description'],
-            "bank_code" => ""
+            "bank_code" => "zalopayapp"
         ];
 
         $data = $order["app_id"] . "|" . $order["app_trans_id"] . "|" . $order["app_user"] . "|" . $order["amount"] . "|" . $order["app_time"] . "|" . $order["embed_data"] . "|" . $order["item"];
@@ -85,20 +83,20 @@ class ZaloPayComponent extends Component
         $response = $client->post("{$this->endpoint}/create", $order)->send();
         if ($response->isOk) {
             $order = Order::find()->where(['id' => $params['orderId']])->one();
-            $order->app_trans_id = $app_trans_id;
+            $order->app_trans_id = $appTransId;
             $order->save(false);
             return $response->data;
         }
         return null;
     }
 
-    public function queryOrder($app_trans_id)
+    public function queryOrder($appTransId)
     {
         $client = new Client();
-        $data = $this->appId . "|" . $app_trans_id . "|" . $this->key1;
+        $data = $this->appId . "|" . $appTransId . "|" . $this->key1;
         $params = [
             "app_id" => $this->appId,
-            "app_trans_id" => $app_trans_id,
+            "app_trans_id" => $appTransId,
             "mac" => hash_hmac("sha256", $data, $this->key1)
         ];
 
@@ -109,17 +107,17 @@ class ZaloPayComponent extends Component
         return null;
     }
 
-    public function refundOrder($zp_trans_id, $amount)
+    public function refundOrder($zpTransId, $amount)
     {
         $client = new Client();
         $timestamp = round(microtime(true) * 1000); // miliseconds
         $uid = "$timestamp" . rand(111, 999); // unique id
-
+        $mRefundId = date("ymd") . "_" . $this->appId . "_" . $uid;
         $params = [
             "app_id" => $this->appId,
-            "m_refund_id" => date("ymd") . "_" . $this->appId . "_" . $uid,
+            "m_refund_id" => $mRefundId,
             "timestamp" => $timestamp,
-            "zp_trans_id" => $zp_trans_id,
+            "zp_trans_id" => $zpTransId,
             "amount" => (integer)$amount,
             "description" => "ZaloPay Intergration Demo"
         ];
@@ -128,10 +126,12 @@ class ZaloPayComponent extends Component
         $data = $params["app_id"] . "|" . $params["zp_trans_id"] . "|" . $params["amount"]
             . "|" . $params["description"] . "|" . $params["timestamp"];
         $params["mac"] = hash_hmac("sha256", $data, $this->key1);
-        var_dump($params);
         $response = $client->post("{$this->endpoint}/refund", $params)->send();
 
         if ($response->isOk) {
+            $order = Order::find()->where(['zp_trans_id' => $zpTransId])->one();
+            $order->m_refund_id = $mRefundId;
+            $order->save(false);
             return $response->data;
         }
         return null;
