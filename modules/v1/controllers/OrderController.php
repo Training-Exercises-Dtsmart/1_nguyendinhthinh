@@ -39,39 +39,31 @@ class OrderController extends Controller
      */
     public function actionGenerateQr()
     {
-//        $json = file_get_contents('php://input');
-//        $data = json::decode($json, true);
-//        if (empty($data['accountNo']) || empty($data['accountName']) || empty($data['acqId']) || empty($data['amount'])) {
-//            return $this->asJson([
-//                'code' => '01',
-//                'desc' => 'Thiếu dữ liệu đầu vào'
-//            ]);
-//        }
 
         $data = Yii::$app->request->post();
 
         $client = new Client();
         $response = $client->createRequest()
             ->setMethod('POST')
-            ->setUrl('https://api.vietqr.io/v2/generate')
+            ->setUrl(env('VIETQR_GENERATE_URL'))
             ->setHeaders([
-                'x-client-id' => '55e2537a-e411-488d-93b1-959223743505',
-                'x-api-key' => '7a658b20-fdd4-432b-a4c5-44bf720a5193',
+                'x-client-id' => env('VIETQR_X_CLIENT_ID'),
+                'x-api-key' => env('VIETQR_X_API_KEY'),
                 'Content-Type' => 'application/json',
             ])
             ->setContent(Json::encode([
                 'accountNo' => $data['accountNo'],
                 'accountName' => $data['accountName'],
                 'acqId' => $data['acqId'],
-                'amount' => $data['amount'], // Số tiền cần điều chỉnh theo nhu cầu
+                'amount' => $data['amount'],
                 'addInfo' => $data['addInfo'],
                 'template' => 'compact'
             ]))
             ->send();
         if ($response->isOk) {
-            return $response->data;
+            return $this->json(true, ['qr' => $response->data], 'Generate qr successfully', HttpStatus::OK);
         }
-        return null; // Hoặc xử lý lỗi theo yêu cầu
+        return $this->json(false, [], 'Failed to generate qr', HttpStatus::OK);
     }
 
     public function actionCallback()
