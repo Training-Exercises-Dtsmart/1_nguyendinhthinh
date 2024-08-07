@@ -1,4 +1,7 @@
 <?php
+
+use yii\filters\Cors;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/test_db.php';
 
@@ -10,7 +13,7 @@ return [
     'basePath' => dirname(__DIR__),
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
     ],
     'language' => 'en-US',
     'components' => [
@@ -22,14 +25,28 @@ return [
             'useFileTransport' => true,
             'messageClass' => 'yii\symfonymailer\Message'
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+        ],
+        'queue' => [
+            'class' => \yii\queue\db\Queue::class,
+            'db' => 'db',
+            'tableName' => '{{%queue}}',
+            'channel' => 'default',
+            'mutex' => \yii\mutex\MysqlMutex::class,
+        ],
         'assetManager' => [
             'basePath' => __DIR__ . '/../web/assets',
         ],
         'urlManager' => [
-            'showScriptName' => true,
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass' => 'app\modules\v1\models\User',
+            'enableAutoLogin' => false,
+            'enableSession' => false,
+            'loginUrl' => null,
         ],
         'request' => [
             'cookieValidationKey' => 'test',
@@ -41,6 +58,25 @@ return [
             ],
             */
         ],
+    ],
+    'modules' => [
+        'api' => [
+            'class' => 'yii\base\Module',
+            'modules' => [
+                'v1' => [
+                    'class' => 'app\modules\v1\Module',
+                ],
+            ],
+            'as corsFilter' => [
+                'class' => Cors::class,
+                'cors' => [
+                    'Origin' => ['*'],
+                    'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+                    'Access-Control-Request-Headers' => ['*'],
+                ],
+            ],
+        ],
+
     ],
     'params' => $params,
 ];

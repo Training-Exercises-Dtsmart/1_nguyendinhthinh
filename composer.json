@@ -32,7 +32,8 @@
     "google/apiclient": "2.15.0",
     "roopz/yii2-imap": "dev-master",
     "ext-imap": "*",
-    "cboden/ratchet": "^0.4.4"
+    "cboden/ratchet": "^0.4.4",
+    "php-imap/php-imap": "^5.0"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",
